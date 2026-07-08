@@ -6,9 +6,8 @@
 {{-- Hero bento grid --}}
 <section class="max-w-7xl mx-auto px-4 py-6 md:py-10" x-data="heroSlider()">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5">
-        {{-- Main hero --}}
+        {{-- Main hero (static banners) --}}
         <div class="md:col-span-8 relative rounded-3xl overflow-hidden min-h-[280px] md:min-h-[380px] bg-souq-900">
-            @if (count($heroBanners) > 0)
             <template x-for="(banner, index) in banners" :key="index">
                 <div x-show="current === index"
                      x-transition:enter="transition ease-out duration-700"
@@ -43,19 +42,11 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
             </div>
-            @else
-            <div class="absolute inset-0 flex items-center justify-center p-8 text-center">
-                <div>
-                    <h1 class="text-2xl md:text-3xl font-extrabold text-white mb-2">Welcome to E-Souq Plus</h1>
-                    <p class="text-souq-200 text-sm">Add categories in the admin panel to populate the homepage.</p>
-                </div>
-            </div>
-            @endif
         </div>
 
-        {{-- Side promo cards (from DB categories beyond hero slides) --}}
+        {{-- Side promo cards (static) --}}
         <div class="md:col-span-4 grid grid-rows-2 gap-4 md:gap-5">
-            @forelse ($sidePromoCategories as $promo)
+            @foreach ($sidePromoCategories as $promo)
             <a href="{{ $promo['url'] }}" class="group relative rounded-3xl overflow-hidden min-h-[140px] hover:shadow-xl transition">
                 @if ($promo['image'])
                 <img src="{{ $promo['image'] }}" alt="{{ $promo['name'] }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -69,13 +60,7 @@
                     <span class="text-white text-sm font-semibold group-hover:underline">Shop now →</span>
                 </div>
             </a>
-            @empty
-            <a href="{{ route('store.categories.index') }}" class="group relative rounded-3xl overflow-hidden bg-gradient-to-br from-accent-500 to-accent-600 p-6 flex flex-col justify-end min-h-[140px] hover:shadow-xl transition">
-                <p class="text-white/80 text-xs font-semibold uppercase tracking-wider mb-1">Explore</p>
-                <h3 class="text-xl font-extrabold text-white mb-2">All Categories</h3>
-                <span class="text-white text-sm font-semibold group-hover:underline">Browse →</span>
-            </a>
-            @endforelse
+            @endforeach
             <a href="{{ route('store.products.index') }}" class="group relative rounded-3xl overflow-hidden bg-gradient-to-br from-souq-600 to-souq-800 p-6 flex flex-col justify-end min-h-[140px] hover:shadow-xl transition">
                 <p class="text-souq-200 text-xs font-semibold uppercase tracking-wider mb-1">Browse</p>
                 <h3 class="text-xl font-extrabold text-white mb-2">All Products</h3>
@@ -107,43 +92,27 @@
     </div>
 </section>
 
-{{-- Categories --}}
+{{-- Categories (static tiles matching hero) --}}
 <section class="max-w-7xl mx-auto px-4 py-8 md:py-12">
     <div class="flex items-end justify-between mb-6">
         <div>
             <h2 class="text-2xl md:text-3xl font-extrabold text-stone-900">Browse Categories</h2>
-            <p class="text-stone-500 text-sm mt-1">Shop from categories added in your store</p>
+            <p class="text-stone-500 text-sm mt-1">Carpets, jewelry, stones & beads, and perfumes</p>
         </div>
-        @if (count($homeCategories) > 0)
         <a href="{{ route('store.categories.index') }}" class="hidden sm:flex items-center gap-1 text-sm font-semibold text-souq-600 hover:text-souq-800 transition">
             View All <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </a>
-        @endif
     </div>
-    @if (count($homeCategories) > 0)
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
-        @foreach ($homeCategories as $cat)
+    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        @foreach ($staticCategoryTiles as $cat)
         <a href="{{ route('store.categories.show', $cat['slug']) }}" class="group text-center">
             <div class="aspect-square rounded-2xl overflow-hidden bg-stone-100 border-2 border-stone-200 group-hover:border-souq-400 group-hover:shadow-lg transition-all mb-2">
-                @if ($cat['image'])
                 <img src="{{ $cat['image'] }}" alt="{{ $cat['name'] }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                @else
-                <div class="w-full h-full bg-gradient-to-br from-souq-500 to-souq-800 flex items-center justify-center">
-                    <span class="text-2xl font-extrabold text-white">{{ strtoupper(substr($cat['name'], 0, 1)) }}</span>
-                </div>
-                @endif
             </div>
             <p class="text-xs md:text-sm font-semibold text-stone-800 line-clamp-2 group-hover:text-souq-700 transition">{{ $cat['name'] }}</p>
-            <p class="text-[10px] text-stone-400">{{ $cat['count'] }} {{ $cat['count'] === 1 ? 'item' : 'items' }}</p>
         </a>
         @endforeach
     </div>
-    @else
-    <div class="text-center py-16 bg-white rounded-3xl border border-stone-200">
-        <p class="text-stone-600 font-medium">No categories available yet.</p>
-        <p class="text-stone-400 text-sm mt-1">Categories added in the admin panel will appear here.</p>
-    </div>
-    @endif
 </section>
 
 {{-- Featured Products --}}
@@ -210,19 +179,17 @@
 </section>
 
 {{-- Promo strip --}}
-@if (count($homeCategories) > 0)
 <section class="max-w-7xl mx-auto px-4 py-12">
     <div class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-souq-800 to-souq-950 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="text-center md:text-left">
             <h2 class="text-2xl md:text-3xl font-extrabold text-white mb-2">Shop Our Collection</h2>
-            <p class="text-souq-200 text-sm max-w-md">{{ collect($homeCategories)->pluck('name')->join(' · ') }}</p>
+            <p class="text-souq-200 text-sm max-w-md">Carpets · Artificial Jewelry · Stone and Beads · Perfumes</p>
         </div>
         <a href="{{ route('store.categories.index') }}" class="shrink-0 px-8 py-3.5 bg-accent-500 hover:bg-accent-600 text-white font-bold rounded-full transition shadow-lg">
             View Categories
         </a>
     </div>
 </section>
-@endif
 
 {{-- New Arrivals --}}
 <section class="max-w-7xl mx-auto px-4 pb-16">

@@ -62,10 +62,16 @@ php artisan serve
 
 ### Seeded Admin Accounts
 
-| Email | Password | Role |
-|-------|----------|------|
-| `admin@e-souq-plus.com` | `E-Souq@Admin2026` | admin |
-| `manager@e-souq-plus.com` | `E-Souq@Manager2026` | manager |
+Set credentials in `.env` before running `php artisan db:seed --class=UserSeeder`:
+
+| Variable | Purpose |
+|----------|---------|
+| `ADMIN_SEED_EMAIL` | Admin login email |
+| `ADMIN_SEED_PASSWORD` | Admin login password |
+| `MANAGER_SEED_EMAIL` | Manager login email |
+| `MANAGER_SEED_PASSWORD` | Manager login password |
+
+Do **not** commit real passwords to git. Use strong unique values locally and in production.
 
 Admin login: `/admin/login`
 

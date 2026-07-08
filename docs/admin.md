@@ -196,6 +196,8 @@ php artisan db:seed --class=StoreCategorySeeder
 - Served via `/storage/...` after `php artisan storage:link`
 - Models use `HasPublicStorageImage` trait for public URL resolution
 
+**If images do not load:** run `php artisan storage:link` on every new machine/deploy. Uploaded files are not in git — only paths in the database. On WAMP, set `APP_URL` to your full site URL (e.g. `http://localhost/e-souq-plus/public`).
+
 ---
 
 ## Activity Logging

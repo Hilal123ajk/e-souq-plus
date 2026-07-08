@@ -1,0 +1,148 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services;
+
+use App\Models\Order;
+use App\Models\Product;
+use App\Support\DeliveryPolicy;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+
+class OrderService
+{
+    /**
+     * @param  array<string, mixed>  $customer
+     * @param  list<array{product_id: int, quantity: int, variant_image_id?: int|null, variant_label?: string|null}>  $items
+     * @return array{order: Order, order_number: string}
+     */
+    public function placeOrder(array $customer, array $items): array
+    {
+        if ($items === []) {
+            throw ValidationException::withMessages([
+                'items' => ['Your cart is empty.'],
+            ]);
+        }
+
+        return DB::transaction(function () use ($customer, $items): array {
+            $lineItems = $this->resolveLineItems($items);
+            $subtotal = round(array_sum(array_column($lineItems, 'line_total')), 2);
+            $deliveryFee = $subtotal > 0 ? (float) DeliveryPolicy::frontendConfig()['fee'] : 0.0;
+            $total = round($subtotal + $deliveryFee, 2);
+
+            $order = Order::query()->create([
+                'order_number' => $this->generateOrderNumber(),
+                'status' => Order::STATUS_PENDING,
+                'first_name' => $customer['first_name'],
+                'last_name' => $customer['last_name'],
+                'email' => $customer['email'],
+                'phone' => $customer['phone'],
+                'address' => $customer['address'],
+                'city' => $customer['city'],
+                'country' => $customer['country'],
+                'notes' => $customer['notes'] ?? null,
+                'payment_method' => $customer['payment_method'] ?? 'cod',
+                'subtotal' => $subtotal,
+                'delivery_fee' => $deliveryFee,
+                'total' => $total,
+            ]);
+
+            foreach ($lineItems as $lineItem) {
+                $order->items()->create($lineItem);
+
+                Product::query()
+                    ->whereKey($lineItem['product_id'])
+                    ->decrement('stock_quantity', $lineItem['quantity']);
+            }
+
+            $order->load('items');
+
+            return [
+                'order' => $order,
+                'order_number' => $order->order_number,
+            ];
+        });
+    }
+
+    /**
+     * @param  list<array{product_id: int, quantity: int, variant_image_id?: int|null, variant_label?: string|null}>  $items
+     * @return list<array<string, mixed>>
+     */
+    private function resolveLineItems(array $items): array
+    {
+        $productIds = array_values(array_unique(array_map(
+            fn (array $item): int => (int) $item['product_id'],
+            $items,
+        )));
+
+        $products = Product::query()
+            ->whereIn('id', $productIds)
+            ->where('is_active', true)
+            ->get()
+            ->keyBy('id');
+
+        $lineItems = [];
+        $errors = [];
+
+        foreach ($items as $index => $item) {
+            $productId = (int) $item['product_id'];
+            $quantity = (int) $item['quantity'];
+            $product = $products->get($productId);
+
+            if (! $product) {
+                $errors["items.{$index}.product_id"] = ['One or more products are no longer available.'];
+                continue;
+            }
+
+            if ($quantity < 1 || $quantity > 99) {
+                $errors["items.{$index}.quantity"] = ['Quantity must be between 1 and 99.'];
+                continue;
+            }
+
+            if ($product->stock_quantity < $quantity) {
+                $errors["items.{$index}.quantity"] = ["Not enough stock for {$product->name}."];
+                continue;
+            }
+
+            $unitPrice = (float) $product->price;
+
+            $lineItems[] = [
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'product_sku' => $product->sku,
+                'variant_label' => isset($item['variant_label']) && $item['variant_label'] !== ''
+                    ? (string) $item['variant_label']
+                    : null,
+                'variant_image_id' => isset($item['variant_image_id']) && $item['variant_image_id'] !== null
+                    ? (int) $item['variant_image_id']
+                    : null,
+                'unit_price' => $unitPrice,
+                'quantity' => $quantity,
+                'line_total' => round($unitPrice * $quantity, 2),
+            ];
+        }
+
+        if ($errors !== []) {
+            throw ValidationException::withMessages($errors);
+        }
+
+        if ($lineItems === []) {
+            throw ValidationException::withMessages([
+                'items' => ['Your cart is empty.'],
+            ]);
+        }
+
+        return $lineItems;
+    }
+
+    private function generateOrderNumber(): string
+    {
+        do {
+            $number = 'ESP-'.now()->format('ymd').'-'.strtoupper(Str::random(6));
+        } while (Order::query()->where('order_number', $number)->exists());
+
+        return $number;
+    }
+}

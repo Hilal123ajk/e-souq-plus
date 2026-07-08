@@ -18,7 +18,18 @@
         </select>
     </div>
 
-    <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
+    <div x-show="!hasOrders" class="bg-white rounded-2xl border border-stone-200 p-12 text-center shadow-sm">
+        <svg class="w-16 h-16 text-stone-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        <h3 class="text-lg font-semibold text-stone-700 mb-1">No orders yet</h3>
+        <p class="text-sm text-stone-500">Orders placed from checkout will appear here.</p>
+    </div>
+
+    <div x-show="hasOrders && orders.length === 0" class="bg-white rounded-2xl border border-stone-200 p-12 text-center shadow-sm">
+        <h3 class="text-lg font-semibold text-stone-700 mb-1">No matching orders</h3>
+        <p class="text-sm text-stone-500">Try adjusting your search or status filter.</p>
+    </div>
+
+    <div x-show="orders.length > 0" class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-stone-50 text-xs text-stone-500 uppercase">
@@ -42,7 +53,7 @@
                             <td class="px-5 py-3 hidden sm:table-cell" x-text="order.items"></td>
                             <td class="px-5 py-3 font-semibold" x-text="ESOUQ_ADMIN.formatPrice(order.total)"></td>
                             <td class="px-5 py-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold capitalize" :class="ESOUQ_ADMIN.statusColors[order.status]" x-text="order.status"></span></td>
-                            <td class="px-5 py-3 hidden lg:table-cell text-xs text-stone-500" x-text="order.createdAt"></td>
+                            <td class="px-5 py-3 hidden lg:table-cell text-xs text-stone-500" x-text="ESOUQ_ADMIN.formatDate(order.createdAt)"></td>
                             <td class="px-5 py-3 text-right">
                                 <button @click.stop="toggleMenu(order.id, $event)" class="p-2 text-stone-400 hover:bg-stone-100 rounded-lg"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/></svg></button>
                             </td>
@@ -73,9 +84,16 @@
                         <h3 class="text-xs font-bold text-stone-500 uppercase mb-2">Customer</h3>
                         <dl class="space-y-1 text-sm">
                             <div class="flex justify-between"><dt class="text-stone-500">Name</dt><dd class="font-medium" x-text="selectedOrder.customer"></dd></div>
+                            <div class="flex justify-between"><dt class="text-stone-500">Email</dt><dd x-text="selectedOrder.email"></dd></div>
                             <div class="flex justify-between"><dt class="text-stone-500">Phone</dt><dd x-text="selectedOrder.phone"></dd></div>
+                            <div class="flex justify-between"><dt class="text-stone-500">Address</dt><dd class="text-right max-w-[60%]" x-text="selectedOrder.address"></dd></div>
                             <div class="flex justify-between"><dt class="text-stone-500">City</dt><dd x-text="selectedOrder.city"></dd></div>
+                            <div class="flex justify-between"><dt class="text-stone-500">Country</dt><dd x-text="selectedOrder.country"></dd></div>
                         </dl>
+                    </div>
+                    <div x-show="selectedOrder.notes">
+                        <h3 class="text-xs font-bold text-stone-500 uppercase mb-2">Notes</h3>
+                        <p class="text-sm text-stone-600" x-text="selectedOrder.notes"></p>
                     </div>
                     <div>
                         <h3 class="text-xs font-bold text-stone-500 uppercase mb-2">Items</h3>
@@ -88,6 +106,10 @@
                     </div>
                     <div class="flex justify-between font-bold text-lg pt-2 border-t">
                         <span>Total</span><span class="text-souq-700" x-text="ESOUQ_ADMIN.formatPrice(selectedOrder.total)"></span>
+                    </div>
+                    <div class="text-xs text-stone-500 space-y-1">
+                        <div class="flex justify-between"><span>Subtotal</span><span x-text="ESOUQ_ADMIN.formatPrice(selectedOrder.subtotal)"></span></div>
+                        <div class="flex justify-between"><span>Delivery</span><span x-text="ESOUQ_ADMIN.formatPrice(selectedOrder.deliveryFee)"></span></div>
                     </div>
                     <button @click="openStatus(selectedOrder)" class="w-full py-3 bg-souq-600 text-white rounded-xl font-semibold text-sm">Update Status</button>
                 </div>
@@ -114,3 +136,9 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+window.ESOUQ_ADMIN.orders = @json($orders);
+</script>
+@endpush

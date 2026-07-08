@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
 use App\Services\StoreCatalogService;
+use App\Support\StaticHomeBanners;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -16,14 +17,12 @@ class HomeController extends Controller
 
     public function index(): View
     {
-        $categories = $this->catalog->getCategoriesForStore();
-
         return view('home', [
             'featuredProducts' => $this->catalog->getShuffledProductsPaginated(8),
             'newArrivals' => $this->catalog->getNewArrivals(5),
-            'heroBanners' => $this->catalog->getHeroSlidesFromCategories(4),
-            'homeCategories' => $categories,
-            'sidePromoCategories' => $this->catalog->getSidePromoCategories(4, 2),
+            'heroBanners' => StaticHomeBanners::slides(),
+            'sidePromoCategories' => StaticHomeBanners::sidePromos(),
+            'staticCategoryTiles' => StaticHomeBanners::categoryTiles(),
         ]);
     }
 

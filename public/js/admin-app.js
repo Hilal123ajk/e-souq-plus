@@ -93,13 +93,42 @@ document.addEventListener('alpine:init', () => {
             return list;
         },
 
+        get hasOrders() {
+            return ESOUQ_ADMIN.orders.length > 0;
+        },
+
         openDetail(order) { this.closeMenu(); this.selectedOrder = order; this.statusDrawerOpen = false; this.openDrawer('detailDrawerOpen'); },
         openStatus(order) { this.closeMenu(); this.selectedOrder = order; this.statusForm = { status: order.status, message: '' }; this.detailDrawerOpen = false; this.openDrawer('statusDrawerOpen'); },
 
         submitStatus() {
             if (!this.selectedOrder) return;
-            Alpine.store('adminUi').notify('Orders backend not connected yet');
-            this.closeDrawer('statusDrawerOpen');
+
+            const order = this.selectedOrder;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+            fetch(`/admin/orders/${order.dbId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify({ status: this.statusForm.status }),
+            })
+                .then(response => response.json().then(data => ({ ok: response.ok, data })))
+                .then(({ ok, data }) => {
+                    if (!ok) {
+                        Alpine.store('adminUi').notify(data.message || 'Unable to update status.', 'error');
+                        return;
+                    }
+
+                    const index = ESOUQ_ADMIN.orders.findIndex(o => o.dbId === order.dbId);
+                    if (index !== -1) ESOUQ_ADMIN.orders[index] = data.order;
+                    this.selectedOrder = data.order;
+                    Alpine.store('adminUi').notify('Order status updated.');
+                    this.closeDrawer('statusDrawerOpen');
+                })
+                .catch(() => Alpine.store('adminUi').notify('Unable to update status.', 'error'));
         },
     }));
 });

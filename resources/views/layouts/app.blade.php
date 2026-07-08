@@ -80,9 +80,7 @@
         window.ESOUQ_STORE.products = @json($storeCatalogProducts ?? []);
         window.ESOUQ_STORE.brands = @json($storeCatalogBrands ?? []);
         window.ESOUQ_STORE.delivery = @json($storeDeliveryConfig ?? \App\Support\DeliveryPolicy::frontendConfig());
-        @if (! empty($heroBanners))
-        window.ESOUQ_STORE.banners = @json($heroBanners);
-        @endif
+        window.ESOUQ_STORE.banners = @json($heroBanners ?? \App\Support\StaticHomeBanners::slides());
     </script>
     <script src="{{ asset('js/store-app.js') }}"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>

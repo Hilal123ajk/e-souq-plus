@@ -354,7 +354,7 @@ document.addEventListener('alpine:init', () => {
             this.placeOrder();
         },
 
-        placeOrder() {
+        async placeOrder() {
             if (this.$store.cart.items.length === 0 || this.submitting) return;
             if (!this.validateForm()) return;
 
@@ -364,13 +364,55 @@ document.addEventListener('alpine:init', () => {
             localStorage.setItem('esouq_city', this.city);
             localStorage.setItem('esouq_country', this.country);
 
-            setTimeout(() => {
-                const num = 'ESP-' + Date.now().toString(36).toUpperCase();
-                this.orderNumber = num;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+            try {
+                const response = await fetch('/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        first_name: this.firstName,
+                        last_name: this.lastName,
+                        email: this.email,
+                        phone: this.phone,
+                        address: this.address,
+                        city: this.city,
+                        country: this.country,
+                        notes: this.notes,
+                        payment_method: this.payment,
+                        items: this.$store.cart.items.map(item => ({
+                            product_id: item.id,
+                            quantity: item.quantity,
+                            variant_image_id: item.variantImageId,
+                            variant_label: item.variantLabel,
+                        })),
+                    }),
+                });
+
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    if (response.status === 422 && data.errors) {
+                        const messages = Object.values(data.errors).flat();
+                        this.error = messages[0] || 'Please check your order details and try again.';
+                    } else {
+                        this.error = data.message || 'Unable to place your order. Please try again.';
+                    }
+                    return;
+                }
+
+                this.orderNumber = data.order_number;
                 this.placed = true;
                 this.$store.cart.clear();
+            } catch {
+                this.error = 'Network error. Please check your connection and try again.';
+            } finally {
                 this.submitting = false;
-            }, 800);
+            }
         },
     }));
 });

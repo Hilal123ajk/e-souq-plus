@@ -20,13 +20,13 @@ trait HasPublicStorageImage
             return $path;
         }
 
-        $storagePath = '/storage/'.ltrim($path, '/');
+        $relativePath = '/storage/'.ltrim($path, '/');
 
         if (app()->runningInConsole()) {
-            return asset(ltrim($storagePath, '/'));
+            return rtrim((string) config('app.url'), '/').$relativePath;
         }
 
-        return rtrim(request()->getSchemeAndHttpHost().request()->getBaseUrl(), '/').$storagePath;
+        return rtrim(request()->getSchemeAndHttpHost().request()->getBaseUrl(), '/').$relativePath;
     }
 
     public function getStoredImagePath(): string

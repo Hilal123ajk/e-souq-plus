@@ -3,10 +3,12 @@
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Store\CategoryController as StoreCategoryController;
 use App\Http\Controllers\Store\HomeController;
+use App\Http\Controllers\Store\OrderController as StoreOrderController;
 use App\Http\Controllers\Store\ProductController as StoreProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +23,7 @@ Route::name('store.')->group(function () {
     Route::get('/categories/{slug}', [StoreCategoryController::class, 'show'])->name('categories.show');
 
     Route::get('/checkout', fn () => view('checkout'))->name('checkout');
+    Route::post('/orders', [StoreOrderController::class, 'store'])->name('orders.store');
     Route::redirect('/cart', '/checkout')->name('cart');
 
     Route::get('/about-us', fn () => view('pages.about'))->name('pages.about');
@@ -99,7 +102,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('/brands/{brand}', [BrandController::class, 'update'])->name('brands.update');
         Route::delete('/brands/{brand}', [BrandController::class, 'destroy'])->name('brands.destroy');
 
-        Route::get('/orders', fn () => view('admin.orders.index'))->name('orders');
+        Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders');
+        Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
         Route::get('/customers', fn () => view('admin.customers.index'))->name('customers');
     });
 });

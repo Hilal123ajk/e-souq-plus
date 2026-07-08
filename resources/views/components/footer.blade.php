@@ -4,8 +4,8 @@
         <div class="max-w-7xl mx-auto px-4 py-12">
             <div class="flex flex-col lg:flex-row items-center justify-between gap-8">
                 <div class="text-center lg:text-left max-w-md">
-                    <h3 class="text-2xl font-extrabold mb-2">Stay in the loop</h3>
-                    <p class="text-souq-200 text-sm">Get exclusive deals on mobile accessories, furniture & more delivered to your inbox.</p>
+                    <h3 class="text-2xl font-extrabold mb-2">Subscribe for new updates</h3>
+                    <p class="text-souq-200 text-sm">Get the latest deals, new arrivals, and offers delivered to your inbox.</p>
                 </div>
                 <form x-data="newsletterForm()" @submit.prevent="subscribe" class="flex w-full lg:w-auto gap-2 max-w-md">
                     <input type="email" x-model="email" placeholder="you@email.com" required :disabled="loading"
