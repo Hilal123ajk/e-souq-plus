@@ -80,6 +80,7 @@ class OrderService
         $products = Product::query()
             ->whereIn('id', $productIds)
             ->where('is_active', true)
+            ->with('images')
             ->get()
             ->keyBy('id');
 
@@ -107,11 +108,20 @@ class OrderService
             }
 
             $unitPrice = (float) $product->price;
+            $imagePath = $product->getStoredImagePath();
+
+            if (isset($item['variant_image_id']) && $item['variant_image_id'] !== null) {
+                $variantImage = $product->images->firstWhere('id', (int) $item['variant_image_id']);
+                if ($variantImage !== null) {
+                    $imagePath = $variantImage->getStoredImagePath();
+                }
+            }
 
             $lineItems[] = [
                 'product_id' => $product->id,
                 'product_name' => $product->name,
                 'product_sku' => $product->sku,
+                'product_image_url' => $imagePath !== '' ? $imagePath : null,
                 'variant_label' => isset($item['variant_label']) && $item['variant_label'] !== ''
                     ? (string) $item['variant_label']
                     : null,

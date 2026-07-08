@@ -26,13 +26,7 @@
             </button>
 
             {{-- Logo --}}
-            <a href="{{ url('/') }}" class="flex items-center gap-1.5 shrink-0 group" aria-label="E-Souq Plus Home">
-                <span class="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-souq-600 to-souq-800 text-white font-extrabold text-sm shadow-md group-hover:shadow-lg transition">E+</span>
-                <div class="leading-tight">
-                    <span class="block text-lg font-extrabold text-souq-900 tracking-tight">E-Souq</span>
-                    <span class="block text-[10px] font-semibold text-accent-500 uppercase tracking-widest -mt-0.5">Plus</span>
-                </div>
-            </a>
+            <x-brand-logo href="{{ url('/') }}" size="lg" class="shrink-0" />
 
             {{-- Search (desktop) --}}
             <form action="{{ route('store.products.index') }}" method="GET" class="hidden md:flex flex-1 max-w-xl mx-6">

@@ -145,8 +145,8 @@ class ProductController extends Controller
 
         unset($data['image'], $data['gallery_images'], $data['gallery_labels'], $data['remove_gallery_ids']);
 
-        if (array_key_exists('slug', $data) && $data['slug'] === '') {
-            unset($data['slug']);
+        if (array_key_exists('slug', $data) && blank($data['slug'])) {
+            $data['slug'] = Product::generateUniqueSlug($data['name'], $product->id);
         }
 
         if (empty($data['brand_id'])) {

@@ -10,10 +10,7 @@
             <div class="absolute bottom-0 left-0 w-64 h-64 bg-accent-500 rounded-full blur-3xl"></div>
         </div>
         <div class="relative">
-            <div class="flex items-center gap-2">
-                <span class="w-10 h-10 rounded-xl bg-accent-500 text-white font-extrabold flex items-center justify-center">E+</span>
-                <span class="text-white font-bold text-xl">E-Souq Plus</span>
-            </div>
+            <x-brand-logo theme="dark" size="xl" />
         </div>
         <div class="relative">
             <h2 class="text-3xl font-extrabold text-white mb-3">Manage your marketplace</h2>
@@ -25,10 +22,7 @@
     <div class="flex-1 flex items-center justify-center p-6 bg-stone-50">
         <div class="w-full max-w-md">
             <div class="lg:hidden text-center mb-8">
-                <span class="inline-flex items-center gap-2">
-                    <span class="w-10 h-10 rounded-xl bg-souq-600 text-white font-extrabold flex items-center justify-center">E+</span>
-                    <span class="font-bold text-xl text-stone-900">E-Souq Plus Admin</span>
-                </span>
+                <x-brand-logo theme="admin-light" size="xl" tagline="Admin Panel" class="items-center" />
             </div>
 
             <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-stone-200">

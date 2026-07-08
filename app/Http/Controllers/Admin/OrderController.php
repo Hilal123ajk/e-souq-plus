@@ -20,7 +20,7 @@ class OrderController extends Controller
     public function index(): View
     {
         $orders = Order::query()
-            ->with('items')
+            ->with(['items.product'])
             ->orderByDesc('created_at')
             ->get()
             ->map(fn (Order $order): array => $order->toAdminArray())
@@ -40,7 +40,7 @@ class OrderController extends Controller
 
         return response()->json([
             'message' => 'Order status updated.',
-            'order' => $order->fresh(['items'])->toAdminArray(),
+            'order' => $order->fresh(['items.product'])->toAdminArray(),
         ]);
     }
 }

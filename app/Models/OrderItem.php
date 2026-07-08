@@ -14,6 +14,7 @@ class OrderItem extends Model
         'product_id',
         'product_name',
         'product_sku',
+        'product_image_url',
         'variant_label',
         'variant_image_id',
         'unit_price',
@@ -39,5 +40,30 @@ class OrderItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function getImagePublicUrlAttribute(): string
+    {
+        $path = $this->product_image_url ?? '';
+
+        if ($path === '' && $this->relationLoaded('product') && $this->product !== null) {
+            $path = $this->product->getStoredImagePath();
+        }
+
+        if ($path === '') {
+            return '';
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        $relativePath = '/storage/'.ltrim($path, '/');
+
+        if (app()->runningInConsole()) {
+            return rtrim((string) config('app.url'), '/').$relativePath;
+        }
+
+        return rtrim(request()->getSchemeAndHttpHost().request()->getBaseUrl(), '/').$relativePath;
     }
 }

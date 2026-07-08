@@ -103,6 +103,8 @@ class Order extends Model
                 'name' => $item->product_name,
                 'qty' => $item->quantity,
                 'price' => (float) $item->unit_price,
+                'lineTotal' => (float) $item->line_total,
+                'image' => $item->image_public_url,
                 'variantLabel' => $item->variant_label,
             ])->values()->all(),
         ];

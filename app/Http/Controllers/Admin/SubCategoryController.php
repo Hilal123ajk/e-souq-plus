@@ -120,8 +120,8 @@ class SubCategoryController extends Controller
 
         unset($data['image']);
 
-        if (array_key_exists('slug', $data) && $data['slug'] === '') {
-            unset($data['slug']);
+        if (array_key_exists('slug', $data) && blank($data['slug'])) {
+            $data['slug'] = Category::generateUniqueSlug($data['title'], $category->id);
         }
 
         $category->update($data);

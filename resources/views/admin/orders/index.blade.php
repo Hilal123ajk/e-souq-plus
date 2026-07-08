@@ -80,38 +80,81 @@
             <template x-if="selectedOrder">
                 <div class="flex-1 overflow-y-auto p-5 space-y-5">
                     <span class="px-2.5 py-1 rounded-full text-xs font-semibold capitalize" :class="ESOUQ_ADMIN.statusColors[selectedOrder.status]" x-text="selectedOrder.status"></span>
-                    <div>
-                        <h3 class="text-xs font-bold text-stone-500 uppercase mb-2">Customer</h3>
-                        <dl class="space-y-1 text-sm">
-                            <div class="flex justify-between"><dt class="text-stone-500">Name</dt><dd class="font-medium" x-text="selectedOrder.customer"></dd></div>
-                            <div class="flex justify-between"><dt class="text-stone-500">Email</dt><dd x-text="selectedOrder.email"></dd></div>
-                            <div class="flex justify-between"><dt class="text-stone-500">Phone</dt><dd x-text="selectedOrder.phone"></dd></div>
-                            <div class="flex justify-between"><dt class="text-stone-500">Address</dt><dd class="text-right max-w-[60%]" x-text="selectedOrder.address"></dd></div>
-                            <div class="flex justify-between"><dt class="text-stone-500">City</dt><dd x-text="selectedOrder.city"></dd></div>
-                            <div class="flex justify-between"><dt class="text-stone-500">Country</dt><dd x-text="selectedOrder.country"></dd></div>
-                        </dl>
-                    </div>
-                    <div x-show="selectedOrder.notes">
-                        <h3 class="text-xs font-bold text-stone-500 uppercase mb-2">Notes</h3>
-                        <p class="text-sm text-stone-600" x-text="selectedOrder.notes"></p>
-                    </div>
-                    <div>
-                        <h3 class="text-xs font-bold text-stone-500 uppercase mb-2">Items</h3>
-                        <template x-for="(item, i) in selectedOrder.lineItems" :key="i">
-                            <div class="flex justify-between py-2 border-b border-stone-100 text-sm">
-                                <span x-text="item.name + ' × ' + item.qty"></span>
-                                <span class="font-semibold" x-text="ESOUQ_ADMIN.formatPrice(item.price * item.qty)"></span>
+
+                    {{-- Customer card --}}
+                    <div class="rounded-2xl border border-stone-200 bg-stone-50 p-4 md:p-5">
+                        <h3 class="text-xs font-bold text-stone-500 uppercase tracking-wide mb-3">Customer Details</h3>
+                        <dl class="grid grid-cols-1 gap-2.5 text-sm">
+                            <div class="flex justify-between gap-4">
+                                <dt class="text-stone-500 shrink-0">Name</dt>
+                                <dd class="font-semibold text-stone-900 text-right" x-text="selectedOrder.customer"></dd>
                             </div>
-                        </template>
+                            <div class="flex justify-between gap-4">
+                                <dt class="text-stone-500 shrink-0">Email</dt>
+                                <dd class="text-stone-800 text-right break-all" x-text="selectedOrder.email"></dd>
+                            </div>
+                            <div class="flex justify-between gap-4">
+                                <dt class="text-stone-500 shrink-0">Phone</dt>
+                                <dd class="text-stone-800 text-right" x-text="selectedOrder.phone"></dd>
+                            </div>
+                            <div class="flex justify-between gap-4">
+                                <dt class="text-stone-500 shrink-0">Address</dt>
+                                <dd class="text-stone-800 text-right max-w-[65%]" x-text="selectedOrder.address"></dd>
+                            </div>
+                            <div class="flex justify-between gap-4">
+                                <dt class="text-stone-500 shrink-0">City</dt>
+                                <dd class="text-stone-800 text-right" x-text="selectedOrder.city"></dd>
+                            </div>
+                            <div class="flex justify-between gap-4">
+                                <dt class="text-stone-500 shrink-0">Country</dt>
+                                <dd class="text-stone-800 text-right" x-text="selectedOrder.country"></dd>
+                            </div>
+                        </dl>
+                        <div x-show="selectedOrder.notes" class="mt-4 pt-4 border-t border-stone-200">
+                            <p class="text-xs font-bold text-stone-500 uppercase mb-1">Notes</p>
+                            <p class="text-sm text-stone-600" x-text="selectedOrder.notes"></p>
+                        </div>
                     </div>
-                    <div class="flex justify-between font-bold text-lg pt-2 border-t">
-                        <span>Total</span><span class="text-souq-700" x-text="ESOUQ_ADMIN.formatPrice(selectedOrder.total)"></span>
+
+                    {{-- Order items --}}
+                    <div>
+                        <h3 class="text-xs font-bold text-stone-500 uppercase tracking-wide mb-3">Order Items</h3>
+                        <div class="space-y-3">
+                            <template x-for="(item, i) in selectedOrder.lineItems" :key="i">
+                                <div class="flex items-center gap-3 p-3 rounded-2xl border border-stone-200 bg-white shadow-sm">
+                                    <div class="w-16 h-16 rounded-xl overflow-hidden bg-stone-100 border border-stone-200 shrink-0">
+                                        <img :src="item.image || ''" :alt="item.name" class="w-full h-full object-cover" x-show="item.image">
+                                        <div x-show="!item.image" class="w-full h-full flex items-center justify-center text-stone-300">
+                                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-semibold text-stone-900 line-clamp-2" x-text="item.name"></p>
+                                        <p x-show="item.variantLabel" class="text-xs text-stone-500 mt-0.5" x-text="item.variantLabel"></p>
+                                        <p class="text-xs text-stone-500 mt-1">
+                                            <span x-text="ESOUQ_ADMIN.formatPrice(item.price)"></span> each
+                                        </p>
+                                    </div>
+                                    <div class="text-right shrink-0">
+                                        <p class="text-xs text-stone-500">Qty <span class="font-semibold text-stone-700" x-text="item.qty"></span></p>
+                                        <p class="text-sm font-bold text-souq-700 mt-1" x-text="ESOUQ_ADMIN.formatPrice(item.lineTotal ?? (item.price * item.qty))"></p>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
                     </div>
-                    <div class="text-xs text-stone-500 space-y-1">
-                        <div class="flex justify-between"><span>Subtotal</span><span x-text="ESOUQ_ADMIN.formatPrice(selectedOrder.subtotal)"></span></div>
-                        <div class="flex justify-between"><span>Delivery</span><span x-text="ESOUQ_ADMIN.formatPrice(selectedOrder.deliveryFee)"></span></div>
+
+                    {{-- Totals --}}
+                    <div class="rounded-2xl border border-stone-200 bg-white p-4 space-y-2 text-sm">
+                        <div class="flex justify-between"><span class="text-stone-500">Subtotal</span><span class="font-medium" x-text="ESOUQ_ADMIN.formatPrice(selectedOrder.subtotal)"></span></div>
+                        <div class="flex justify-between"><span class="text-stone-500">Delivery</span><span class="font-medium" x-text="ESOUQ_ADMIN.formatPrice(selectedOrder.deliveryFee)"></span></div>
+                        <div class="flex justify-between text-base pt-2 border-t border-stone-200">
+                            <span class="font-bold text-stone-900">Total</span>
+                            <span class="font-extrabold text-souq-700" x-text="ESOUQ_ADMIN.formatPrice(selectedOrder.total)"></span>
+                        </div>
                     </div>
-                    <button @click="openStatus(selectedOrder)" class="w-full py-3 bg-souq-600 text-white rounded-xl font-semibold text-sm">Update Status</button>
+
+                    <button @click="openStatus(selectedOrder)" class="w-full py-3 bg-souq-600 text-white rounded-xl font-semibold text-sm hover:bg-souq-700 transition">Update Status</button>
                 </div>
             </template>
         </div>

@@ -6,29 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin') — E-Souq Plus</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'] },
-                    colors: {
-                        souq: { 50:'#f5f3ff',100:'#ede9fe',200:'#ddd6fe',300:'#c4b5fd',400:'#a78bfa',500:'#8b5cf6',600:'#7c3aed',700:'#6d28d9',800:'#5b21b6',900:'#4c1d95',950:'#2e1065' },
-                        accent: { 400:'#fb923c',500:'#f97316',600:'#ea580c' },
-                    },
-                },
-            },
-        };
-    </script>
-    <style>
-        [x-cloak] { display: none !important; }
-        .admin-sidebar-link.active { background: rgba(124, 58, 237, 0.12); color: #fff; border-left: 3px solid #f97316; }
-        .admin-sidebar-link { border-left: 3px solid transparent; }
-    </style>
+    @vite(['resources/css/app.css'])
     @stack('head')
 </head>
 <body class="bg-stone-100 text-stone-800 font-sans antialiased" x-data x-cloak>
@@ -66,7 +44,7 @@
 
 <script src="{{ asset('js/admin-data.js') }}"></script>
 <script src="{{ asset('js/admin-app.js') }}"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+<script defer src="{{ asset('vendor/alpine/alpine.min.js') }}"></script>
 @stack('scripts')
 </body>
 </html>

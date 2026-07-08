@@ -3,8 +3,14 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
-        "dev": "vite"
+        "build": "vite build && node scripts/copy-vendor.mjs",
+        "dev": "vite",
+        "postinstall": "node scripts/copy-vendor.mjs"
+    },
+    "dependencies": {
+        "@fontsource/outfit": "^5.2.5",
+        "@fontsource/plus-jakarta-sans": "^5.2.5",
+        "alpinejs": "^3.14.9"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",

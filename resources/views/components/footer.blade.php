@@ -24,12 +24,8 @@
         <div class="max-w-7xl mx-auto px-4 py-12">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
                 <div class="col-span-2 md:col-span-1">
-                    <div class="flex items-center gap-2 mb-4">
-                        <span class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-souq-500 to-souq-700 text-white font-extrabold text-sm">E+</span>
-                        <div>
-                            <span class="block text-white font-bold">E-Souq Plus</span>
-                            <span class="block text-[10px] text-accent-400 uppercase tracking-wider">Marketplace</span>
-                        </div>
+                    <div class="mb-4">
+                        <x-brand-logo theme="dark" size="lg" tagline="Marketplace" />
                     </div>
                     <p class="text-sm leading-relaxed mb-4">Pakistan's growing online marketplace — mobile accessories, furniture, home décor, electronics & more.</p>
                     <div class="flex gap-2">

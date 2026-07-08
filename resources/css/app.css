@@ -1,9 +1,71 @@
 @import 'tailwindcss';
 
+@import '@fontsource/plus-jakarta-sans/400.css';
+@import '@fontsource/plus-jakarta-sans/500.css';
+@import '@fontsource/plus-jakarta-sans/600.css';
+@import '@fontsource/plus-jakarta-sans/700.css';
+@import '@fontsource/plus-jakarta-sans/800.css';
+@import '@fontsource/outfit/700.css';
+@import '@fontsource/outfit/800.css';
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+@source '../../public/js/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-logo: 'Outfit', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+    --color-souq-50: #f5f3ff;
+    --color-souq-100: #ede9fe;
+    --color-souq-200: #ddd6fe;
+    --color-souq-300: #c4b5fd;
+    --color-souq-400: #a78bfa;
+    --color-souq-500: #8b5cf6;
+    --color-souq-600: #7c3aed;
+    --color-souq-700: #6d28d9;
+    --color-souq-800: #5b21b6;
+    --color-souq-900: #4c1d95;
+    --color-souq-950: #2e1065;
+
+    --color-accent-400: #fb923c;
+    --color-accent-500: #f97316;
+    --color-accent-600: #ea580c;
+}
+
+@layer base {
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@layer utilities {
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}
+
+@layer components {
+    .esouq-brand-logo {
+        font-family: var(--font-logo);
+        font-weight: 800;
+        letter-spacing: -0.045em;
+    }
+
+    .admin-sidebar-link {
+        border-left: 3px solid transparent;
+    }
+
+    .admin-sidebar-link.active {
+        background: rgba(124, 58, 237, 0.12);
+        color: #fff;
+        border-left-color: #f97316;
+    }
 }

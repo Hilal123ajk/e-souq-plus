@@ -7,47 +7,7 @@
     <title>@yield('title', 'E-Souq Plus — Online Marketplace in Pakistan')</title>
     <meta name="description" content="@yield('meta_description', 'E-Souq Plus — Shop mobile accessories, furniture, home décor, electronics & more. Cash on delivery across Pakistan.')">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-                    },
-                    colors: {
-                        souq: {
-                            50: '#f5f3ff',
-                            100: '#ede9fe',
-                            200: '#ddd6fe',
-                            300: '#c4b5fd',
-                            400: '#a78bfa',
-                            500: '#8b5cf6',
-                            600: '#7c3aed',
-                            700: '#6d28d9',
-                            800: '#5b21b6',
-                            900: '#4c1d95',
-                            950: '#2e1065',
-                        },
-                        accent: {
-                            400: '#fb923c',
-                            500: '#f97316',
-                            600: '#ea580c',
-                        },
-                    },
-                },
-            },
-        };
-    </script>
-    <style>
-        [x-cloak] { display: none !important; }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
+    @vite(['resources/css/app.css'])
     @stack('head')
 </head>
 <body class="bg-stone-50 text-stone-800 font-sans antialiased" x-data="toast()" x-cloak>
@@ -83,7 +43,7 @@
         window.ESOUQ_STORE.banners = @json($heroBanners ?? \App\Support\StaticHomeBanners::slides());
     </script>
     <script src="{{ asset('js/store-app.js') }}"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+    <script defer src="{{ asset('vendor/alpine/alpine.min.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

@@ -1,12 +1,8 @@
 <aside :class="$store.adminUi.sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
        class="fixed top-0 left-0 z-50 w-64 h-full bg-stone-900 flex flex-col shadow-xl transition-transform duration-300 lg:translate-x-0 border-r border-stone-800">
 
-    <div class="flex items-center gap-3 px-5 py-5 border-b border-stone-800/80">
-        <span class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-souq-600/90 to-souq-700/90 text-white font-extrabold text-sm">E+</span>
-        <div>
-            <p class="text-white font-bold leading-tight">E-Souq Plus</p>
-            <p class="text-[10px] text-stone-400 uppercase tracking-wider">Admin Panel</p>
-        </div>
+    <div class="px-5 py-5 border-b border-stone-800/80">
+        <x-brand-logo theme="dark" size="md" tagline="Admin Panel" />
     </div>
 
     <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">

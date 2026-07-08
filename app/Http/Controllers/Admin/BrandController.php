@@ -77,8 +77,8 @@ class BrandController extends Controller
 
         unset($data['image']);
 
-        if (array_key_exists('slug', $data) && $data['slug'] === '') {
-            unset($data['slug']);
+        if (array_key_exists('slug', $data) && blank($data['slug'])) {
+            $data['slug'] = Brand::generateUniqueSlug($data['title'], $brand->id);
         }
 
         $brand->update($data);

@@ -6,10 +6,7 @@
 <div class="min-h-screen flex items-center justify-center p-4 bg-stone-50">
     <div class="w-full max-w-md">
         <div class="text-center mb-8">
-            <div class="inline-flex items-center gap-2">
-                <span class="w-10 h-10 rounded-xl bg-souq-600 text-white font-extrabold flex items-center justify-center">E+</span>
-                <span class="font-bold text-xl text-stone-900">E-Souq Plus</span>
-            </div>
+            <x-brand-logo theme="admin-light" size="xl" class="items-center mx-auto" />
             <h1 class="text-xl font-bold text-stone-900 mt-4">Verify your login</h1>
             <p class="text-stone-500 text-sm mt-1">Enter the 5-digit code sent to {{ $maskedEmail }}. It may take a few seconds to arrive.</p>
         </div>

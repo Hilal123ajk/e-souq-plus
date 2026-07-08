@@ -130,12 +130,40 @@
 
     <div x-show="confirmOpen" x-cloak @keydown.escape.window="confirmOpen = false" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
         <div @click="confirmOpen = false" class="absolute inset-0 bg-stone-900/50 backdrop-blur-sm"></div>
-        <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 md:p-7">
-            <h3 class="text-lg font-bold text-stone-900 mb-2">Confirm your order?</h3>
-            <p class="text-sm text-stone-500 mb-6">COD order for <span class="font-semibold" x-text="ESOUQ_STORE.formatPrice($store.cart.grandTotal)"></span></p>
-            <div class="flex gap-3">
-                <button @click="confirmOpen = false" class="flex-1 py-3 border border-stone-200 rounded-full text-sm font-semibold">Go Back</button>
-                <button @click="confirmPlaceOrder()" :disabled="submitting" class="flex-1 py-3 bg-souq-600 text-white rounded-full text-sm font-bold">Confirm</button>
+        <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="px-6 pt-6 pb-4 border-b border-stone-100">
+                <h3 class="text-lg font-bold text-stone-900">Confirm your order</h3>
+                <p class="text-sm text-stone-500 mt-1">Review your items before placing the order.</p>
+            </div>
+            <div class="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+                <template x-for="item in $store.cart.displayItems" :key="item.lineKey">
+                    <div class="flex gap-3 p-3 bg-stone-50 rounded-2xl border border-stone-100">
+                        <div class="w-16 h-16 rounded-xl overflow-hidden bg-white border border-stone-200 shrink-0">
+                            <img :src="item.image" :alt="item.name" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold text-stone-800 line-clamp-2" x-text="item.name"></p>
+                            <p class="text-xs text-stone-500 mt-1">
+                                <span x-text="ESOUQ_STORE.formatPrice($store.cart.unitPrice(item))"></span>
+                                <span> × </span>
+                                <span x-text="item.quantity"></span>
+                            </p>
+                        </div>
+                        <p class="text-sm font-bold text-souq-700 shrink-0 self-center" x-text="ESOUQ_STORE.formatPrice($store.cart.unitPrice(item) * item.quantity)"></p>
+                    </div>
+                </template>
+            </div>
+            <div class="px-6 py-4 border-t border-stone-100 bg-stone-50 space-y-2 text-sm">
+                <div class="flex justify-between"><span class="text-stone-500">Subtotal</span><span class="font-medium" x-text="ESOUQ_STORE.formatPrice($store.cart.total)"></span></div>
+                <div class="flex justify-between"><span class="text-stone-500">Delivery</span><span class="font-medium" x-text="ESOUQ_STORE.formatPrice($store.cart.deliveryFee)"></span></div>
+                <div class="flex justify-between text-base pt-1 border-t border-stone-200">
+                    <span class="font-bold text-stone-900">Total</span>
+                    <span class="font-extrabold text-souq-800" x-text="ESOUQ_STORE.formatPrice($store.cart.grandTotal)"></span>
+                </div>
+            </div>
+            <div class="px-6 pb-6 pt-2 flex gap-3">
+                <button @click="confirmOpen = false" class="flex-1 py-3 border border-stone-200 rounded-full text-sm font-semibold hover:bg-stone-50 transition">Go Back</button>
+                <button @click="confirmPlaceOrder()" :disabled="submitting" class="flex-1 py-3 bg-souq-600 hover:bg-souq-700 disabled:bg-stone-300 text-white rounded-full text-sm font-bold transition">Confirm Order</button>
             </div>
         </div>
     </div>
