@@ -5,12 +5,16 @@
 @section('content')
 <x-mobile-back-nav :fallback="route('store.home')" />
 
-<section class="max-w-7xl mx-auto px-4 py-6 md:py-10" x-data="checkoutForm()">
+<section class="max-w-7xl mx-auto px-4 py-6 md:py-10"
+         x-data="checkoutForm()"
+         data-order-success="{{ e(session('order_success.order_number') ?? '') }}"
+         data-payment-cancelled="{{ request()->boolean('payment_cancelled') ? '1' : '0' }}"
+         data-checkout-error="{{ e(session('checkout_error') ?? '') }}">
     <div x-show="placed" x-cloak class="max-w-lg mx-auto text-center py-16">
         <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-10 h-10 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
         </div>
-        <h1 class="text-2xl font-extrabold text-stone-900 mb-2">Order Placed!</h1>
+        <h1 class="text-2xl font-extrabold text-stone-900 mb-2">Order confirmed!</h1>
         <p class="text-stone-500 text-sm mb-2">Thank you! We'll contact you shortly to confirm delivery.</p>
         <p class="text-sm font-semibold text-souq-800 mb-6" x-show="orderNumber">Order: <span x-text="orderNumber"></span></p>
         <a href="{{ route('store.home') }}" class="inline-flex px-8 py-3 bg-souq-600 text-white font-bold rounded-full hover:bg-souq-700 transition">Continue Shopping</a>
@@ -80,13 +84,25 @@
                         <span class="w-8 h-8 bg-souq-600 text-white text-sm font-bold rounded-full flex items-center justify-center">2</span>
                         Payment
                     </h2>
-                    <label class="flex items-center gap-3 p-4 border-2 border-souq-500 bg-souq-50 rounded-2xl cursor-pointer">
-                        <input type="radio" x-model="payment" value="cod" class="accent-souq-600">
-                        <div>
-                            <p class="font-semibold text-stone-900 text-sm">Cash on Delivery</p>
-                            <p class="text-xs text-stone-500">Pay when your order arrives</p>
-                        </div>
-                    </label>
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-3 p-4 border-2 rounded-2xl cursor-pointer transition"
+                               :class="payment === 'stripe' ? 'border-souq-500 bg-souq-50' : 'border-stone-200 hover:border-stone-300'">
+                            <input type="radio" x-model="payment" value="stripe" class="accent-souq-600">
+                            <div class="flex-1">
+                                <p class="font-semibold text-stone-900 text-sm">Pay securely with card</p>
+                                <p class="text-xs text-stone-500">Redirected to Stripe for secure checkout</p>
+                            </div>
+                            <svg class="w-8 h-5 shrink-0" viewBox="0 0 60 25" aria-hidden="true"><text x="0" y="18" font-size="14" font-weight="700" fill="#635bff">stripe</text></svg>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 border-2 rounded-2xl cursor-pointer transition"
+                               :class="payment === 'cod' ? 'border-souq-500 bg-souq-50' : 'border-stone-200 hover:border-stone-300'">
+                            <input type="radio" x-model="payment" value="cod" class="accent-souq-600">
+                            <div>
+                                <p class="font-semibold text-stone-900 text-sm">Cash on Delivery</p>
+                                <p class="text-xs text-stone-500">Pay when your order arrives</p>
+                            </div>
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -119,8 +135,8 @@
                     </div>
                     <button type="button" @click="requestPlaceOrder()" :disabled="submitting"
                             class="w-full mt-5 py-3.5 bg-gradient-to-r from-souq-600 to-souq-700 hover:from-souq-700 hover:to-souq-800 disabled:from-stone-300 disabled:to-stone-300 text-white font-bold rounded-full transition">
-                        <span x-show="!submitting">Place Order</span>
-                        <span x-show="submitting">Placing Order…</span>
+                        <span x-show="!submitting" x-text="payment === 'stripe' ? 'Pay securely' : 'Place order'"></span>
+                        <span x-show="submitting" x-text="payment === 'stripe' ? 'Redirecting to Stripe…' : 'Placing order…'"></span>
                     </button>
                     <p x-show="error" x-text="error" class="mt-3 text-sm text-red-600 text-center"></p>
                 </div>
@@ -163,7 +179,8 @@
             </div>
             <div class="px-6 pb-6 pt-2 flex gap-3">
                 <button @click="confirmOpen = false" class="flex-1 py-3 border border-stone-200 rounded-full text-sm font-semibold hover:bg-stone-50 transition">Go Back</button>
-                <button @click="confirmPlaceOrder()" :disabled="submitting" class="flex-1 py-3 bg-souq-600 hover:bg-souq-700 disabled:bg-stone-300 text-white rounded-full text-sm font-bold transition">Confirm Order</button>
+                <button @click="confirmPlaceOrder()" :disabled="submitting" class="flex-1 py-3 bg-souq-600 hover:bg-souq-700 disabled:bg-stone-300 text-white rounded-full text-sm font-bold transition"
+                        x-text="payment === 'stripe' ? 'Continue to payment' : 'Confirm order'"></button>
             </div>
         </div>
     </div>

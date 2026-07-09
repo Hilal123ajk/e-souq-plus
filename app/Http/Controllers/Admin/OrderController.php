@@ -15,7 +15,7 @@ class OrderController extends Controller
     public function index(): View
     {
         $orders = Order::query()
-            ->with(['items.product'])
+            ->with(['items.product', 'paymentEvents'])
             ->orderByDesc('created_at')
             ->get()
             ->map(fn (Order $order): array => $order->toAdminArray())

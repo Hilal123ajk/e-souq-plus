@@ -19,7 +19,7 @@ class OrderController extends Controller
     {
         $validated = $request->validated();
 
-        $result = $this->orderService->placeOrder(
+        $result = $this->orderService->placeCodOrder(
             [
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
@@ -29,7 +29,6 @@ class OrderController extends Controller
                 'city' => $validated['city'],
                 'country' => $validated['country'],
                 'notes' => $validated['notes'] ?? null,
-                'payment_method' => $validated['payment_method'],
             ],
             $validated['items'],
         );

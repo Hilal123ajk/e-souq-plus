@@ -144,6 +144,48 @@
                         </div>
                     </div>
 
+                    {{-- Payment --}}
+                    <div x-show="selectedOrder.paymentMethod === 'stripe'" class="rounded-2xl border border-stone-200 bg-white p-4 md:p-5">
+                        <h3 class="text-xs font-bold text-stone-500 uppercase tracking-wide mb-3">Payment</h3>
+                        <dl class="grid grid-cols-1 gap-2.5 text-sm mb-4">
+                            <div class="flex justify-between gap-4">
+                                <dt class="text-stone-500 shrink-0">Method</dt>
+                                <dd class="font-semibold text-stone-900 text-right capitalize" x-text="selectedOrder.paymentMethod === 'stripe' ? 'Card (Stripe)' : selectedOrder.paymentMethod"></dd>
+                            </div>
+                            <div class="flex justify-between gap-4">
+                                <dt class="text-stone-500 shrink-0">Status</dt>
+                                <dd class="font-semibold text-right capitalize" :class="selectedOrder.paymentStatus === 'paid' ? 'text-emerald-700' : (selectedOrder.paymentStatus === 'failed' ? 'text-red-600' : 'text-amber-700')" x-text="selectedOrder.paymentStatus || 'unpaid'"></dd>
+                            </div>
+                            <div x-show="selectedOrder.paidAt" class="flex justify-between gap-4">
+                                <dt class="text-stone-500 shrink-0">Paid at</dt>
+                                <dd class="text-stone-800 text-right" x-text="ESOUQ_ADMIN.formatDate(selectedOrder.paidAt)"></dd>
+                            </div>
+                            <div x-show="selectedOrder.stripePaymentIntentId" class="flex justify-between gap-4">
+                                <dt class="text-stone-500 shrink-0">Payment intent</dt>
+                                <dd class="text-xs text-stone-600 text-right break-all font-mono" x-text="selectedOrder.stripePaymentIntentId"></dd>
+                            </div>
+                        </dl>
+
+                        <div x-show="selectedOrder.paymentEvents && selectedOrder.paymentEvents.length > 0">
+                            <p class="text-xs font-bold text-stone-500 uppercase tracking-wide mb-2">Transaction history</p>
+                            <div class="space-y-2">
+                                <template x-for="(event, i) in selectedOrder.paymentEvents" :key="i">
+                                    <div class="rounded-xl border border-stone-100 bg-stone-50 px-3 py-2.5 text-xs">
+                                        <div class="flex justify-between gap-2 mb-1">
+                                            <span class="font-semibold text-stone-800 capitalize" x-text="event.eventType.replaceAll('_', ' ')"></span>
+                                            <span class="text-stone-400 shrink-0" x-text="ESOUQ_ADMIN.formatDate(event.createdAt)"></span>
+                                        </div>
+                                        <p x-show="event.status" class="text-stone-600">Status: <span class="font-medium" x-text="event.status"></span></p>
+                                        <p x-show="event.amount != null" class="text-stone-600">Amount: <span class="font-medium" x-text="event.amount + ' ' + (event.currency || '').toUpperCase()"></span></p>
+                                        <p x-show="event.sessionId" class="text-stone-500 break-all font-mono mt-1" x-text="'Session: ' + event.sessionId"></p>
+                                        <p x-show="event.paymentIntentId" class="text-stone-500 break-all font-mono" x-text="'Intent: ' + event.paymentIntentId"></p>
+                                        <p x-show="event.failureMessage" class="text-red-600 mt-1" x-text="event.failureMessage"></p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- Totals --}}
                     <div class="rounded-2xl border border-stone-200 bg-white p-4 space-y-2 text-sm">
                         <div class="flex justify-between"><span class="text-stone-500">Subtotal</span><span class="font-medium" x-text="ESOUQ_ADMIN.formatPrice(selectedOrder.subtotal)"></span></div>

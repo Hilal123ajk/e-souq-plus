@@ -11,6 +11,7 @@ use App\Http\Controllers\Store\HomeController;
 use App\Http\Controllers\Store\OrderController as StoreOrderController;
 use App\Http\Controllers\Store\ProductController as StoreProductController;
 use App\Http\Controllers\Store\SitemapController;
+use App\Http\Controllers\Store\StripeCheckoutController;
 use Illuminate\Support\Facades\Route;
 
 Route::name('store.')->group(function () {
@@ -40,6 +41,15 @@ Route::name('store.')->group(function () {
     Route::post('/orders', [StoreOrderController::class, 'store'])
         ->middleware('throttle:store-orders')
         ->name('orders.store');
+    Route::post('/checkout/stripe', [StripeCheckoutController::class, 'store'])
+        ->middleware('throttle:store-orders')
+        ->name('checkout.stripe.store');
+    Route::get('/checkout/stripe/success', [StripeCheckoutController::class, 'success'])
+        ->name('checkout.stripe.success');
+    Route::get('/checkout/stripe/cancel/{order}', [StripeCheckoutController::class, 'cancel'])
+        ->name('checkout.stripe.cancel');
+    Route::post('/stripe/webhook', [StripeCheckoutController::class, 'webhook'])
+        ->name('stripe.webhook');
     Route::redirect('/cart', '/checkout')->name('cart');
 
     Route::get('/about-us', fn () => view('pages.about'))->name('pages.about');

@@ -6,9 +6,8 @@ namespace App\Http\Requests\Store;
 
 use App\Http\Requests\Store\Concerns\ValidatesCheckoutOrder;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class PlaceOrderRequest extends FormRequest
+class StartStripeCheckoutRequest extends FormRequest
 {
     use ValidatesCheckoutOrder;
 
@@ -19,9 +18,7 @@ class PlaceOrderRequest extends FormRequest
 
     public function rules(): array
     {
-        return array_merge($this->checkoutOrderRules(), [
-            'payment_method' => ['required', 'string', Rule::in(['cod'])],
-        ]);
+        return $this->checkoutOrderRules();
     }
 
     protected function prepareForValidation(): void

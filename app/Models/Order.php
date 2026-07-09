@@ -19,6 +19,16 @@ class Order extends Model
 
     public const STATUS_CANCELLED = 'cancelled';
 
+    public const PAYMENT_METHOD_COD = 'cod';
+
+    public const PAYMENT_METHOD_STRIPE = 'stripe';
+
+    public const PAYMENT_STATUS_UNPAID = 'unpaid';
+
+    public const PAYMENT_STATUS_PAID = 'paid';
+
+    public const PAYMENT_STATUS_FAILED = 'failed';
+
     /** @var list<string> */
     public const STATUSES = [
         self::STATUS_PENDING,
@@ -40,6 +50,10 @@ class Order extends Model
         'country',
         'notes',
         'payment_method',
+        'payment_status',
+        'stripe_checkout_session_id',
+        'stripe_payment_intent_id',
+        'paid_at',
         'subtotal',
         'delivery_fee',
         'total',
@@ -51,12 +65,18 @@ class Order extends Model
             'subtotal' => 'decimal:2',
             'delivery_fee' => 'decimal:2',
             'total' => 'decimal:2',
+            'paid_at' => 'datetime',
         ];
     }
 
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function paymentEvents(): HasMany
+    {
+        return $this->hasMany(OrderPaymentEvent::class)->orderBy('created_at');
     }
 
     public function getCustomerNameAttribute(): string
@@ -78,7 +98,7 @@ class Order extends Model
      */
     public function toAdminArray(): array
     {
-        $this->loadMissing('items');
+        $this->loadMissing(['items', 'paymentEvents']);
 
         $itemCount = $this->item_count;
 
@@ -98,6 +118,13 @@ class Order extends Model
             'deliveryFee' => (float) $this->delivery_fee,
             'status' => $this->status,
             'paymentMethod' => $this->payment_method,
+            'paymentStatus' => $this->payment_status,
+            'paidAt' => $this->paid_at?->toIso8601String(),
+            'stripeCheckoutSessionId' => $this->stripe_checkout_session_id,
+            'stripePaymentIntentId' => $this->stripe_payment_intent_id,
+            'paymentEvents' => $this->paymentEvents->map(
+                fn (OrderPaymentEvent $event): array => $event->toAdminArray(),
+            )->values()->all(),
             'createdAt' => $this->created_at?->toIso8601String(),
             'lineItems' => $this->items->map(fn (OrderItem $item): array => [
                 'name' => $item->product_name,

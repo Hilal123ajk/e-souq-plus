@@ -299,13 +299,31 @@ document.addEventListener('alpine:init', () => {
         city: localStorage.getItem('esouq_city') || '',
         country: localStorage.getItem('esouq_country') || 'United Arab Emirates',
         notes: '',
-        payment: 'cod',
+        payment: 'stripe',
         placed: false,
         orderNumber: '',
         submitting: false,
         confirmOpen: false,
         error: '',
         fieldErrors: {},
+
+        init() {
+            const orderSuccess = this.$el.dataset.orderSuccess;
+            if (orderSuccess) {
+                this.placed = true;
+                this.orderNumber = orderSuccess;
+                this.$store.cart.clear();
+            }
+
+            if (this.$el.dataset.paymentCancelled === '1') {
+                this.error = 'Payment was cancelled. You can try again or choose Cash on Delivery.';
+            }
+
+            const checkoutError = this.$el.dataset.checkoutError;
+            if (checkoutError) {
+                this.error = checkoutError;
+            }
+        },
 
         sanitizeInput(value) {
             if (typeof value !== 'string') return '';
@@ -365,32 +383,37 @@ document.addEventListener('alpine:init', () => {
             localStorage.setItem('esouq_country', this.country);
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const payload = {
+                first_name: this.firstName,
+                last_name: this.lastName,
+                email: this.email,
+                phone: this.phone,
+                address: this.address,
+                city: this.city,
+                country: this.country,
+                notes: this.notes,
+                items: this.$store.cart.items.map(item => ({
+                    product_id: item.id,
+                    quantity: item.quantity,
+                    variant_image_id: item.variantImageId,
+                    variant_label: item.variantLabel,
+                })),
+            };
+
+            const endpoint = this.payment === 'stripe' ? '/checkout/stripe' : '/orders';
+            const body = this.payment === 'cod'
+                ? { ...payload, payment_method: 'cod' }
+                : payload;
 
             try {
-                const response = await fetch('/orders', {
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': csrfToken,
                     },
-                    body: JSON.stringify({
-                        first_name: this.firstName,
-                        last_name: this.lastName,
-                        email: this.email,
-                        phone: this.phone,
-                        address: this.address,
-                        city: this.city,
-                        country: this.country,
-                        notes: this.notes,
-                        payment_method: this.payment,
-                        items: this.$store.cart.items.map(item => ({
-                            product_id: item.id,
-                            quantity: item.quantity,
-                            variant_image_id: item.variantImageId,
-                            variant_label: item.variantLabel,
-                        })),
-                    }),
+                    body: JSON.stringify(body),
                 });
 
                 const data = await response.json().catch(() => ({}));
@@ -407,13 +430,20 @@ document.addEventListener('alpine:init', () => {
                     return;
                 }
 
+                if (this.payment === 'stripe' && data.checkout_url) {
+                    window.location.href = data.checkout_url;
+                    return;
+                }
+
                 this.orderNumber = data.order_number;
                 this.placed = true;
                 this.$store.cart.clear();
             } catch {
                 this.error = 'Network error. Please check your connection and try again.';
             } finally {
-                this.submitting = false;
+                if (this.payment !== 'stripe') {
+                    this.submitting = false;
+                }
             }
         },
     }));
