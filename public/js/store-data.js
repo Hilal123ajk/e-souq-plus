@@ -1,21 +1,9 @@
 window.ESOUQ_STORE = {
-    site: {
-        name: 'E-Souq Plus',
-        tagline: 'Your Marketplace for Everything',
-        phone: '+971 50 123 4567',
-        whatsapp: '+971 50 123 4567',
-        email: 'hello@e-souq-plus.com',
-    },
-
-    delivery: { fee: 25 },
-
-    banners: [],
-
     categories: [],
-
     brands: [],
-
     products: [],
+    delivery: { fee: 25 },
+    banners: [],
 };
 
 ESOUQ_STORE.getProduct = function (slug) {
@@ -57,12 +45,4 @@ ESOUQ_STORE.goBack = function (fallbackUrl) {
         }
     } catch (_) {}
     window.location.href = fallback;
-};
-
-ESOUQ_STORE.getFeaturedProducts = function (limit = 8) {
-    return this.products.filter(p => p.featured).slice(0, limit);
-};
-
-ESOUQ_STORE.getNewArrivals = function (limit = 5) {
-    return this.products.slice(0, limit);
 };

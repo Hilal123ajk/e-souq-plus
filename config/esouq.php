@@ -8,6 +8,14 @@ return [
     'admin_otp_valid_days' => 7,
     'admin_otp_expiry_minutes' => 15,
 
+    'seo' => [
+        'site_name' => 'E-Souq Plus',
+        'default_description' => 'Shop carpets, artificial jewelry, stones & beads, perfumes and more at E-Souq Plus. Cash on delivery across the UAE.',
+        'default_image' => '/banners/carpets.jpg',
+        'locale' => 'en_AE',
+        'twitter_handle' => null,
+    ],
+
     /*
     | Static homepage hero carousel — not driven by admin categories.
     | Images live in public/banners/

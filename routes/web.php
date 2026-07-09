@@ -10,9 +10,23 @@ use App\Http\Controllers\Store\CategoryController as StoreCategoryController;
 use App\Http\Controllers\Store\HomeController;
 use App\Http\Controllers\Store\OrderController as StoreOrderController;
 use App\Http\Controllers\Store\ProductController as StoreProductController;
+use App\Http\Controllers\Store\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 Route::name('store.')->group(function () {
+    Route::get('/robots.txt', function () {
+        $content = implode("\n", [
+            'User-agent: *',
+            'Disallow: /admin',
+            'Disallow: /checkout',
+            '',
+            'Sitemap: '.url('/sitemap.xml'),
+        ]);
+
+        return response($content, 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+    })->name('robots');
+
+    Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
     Route::get('/', [HomeController::class, 'index'])->name('home');
 
     Route::get('/categories/all', [StoreProductController::class, 'index'])->name('products.index');
@@ -23,7 +37,9 @@ Route::name('store.')->group(function () {
     Route::get('/categories/{slug}', [StoreCategoryController::class, 'show'])->name('categories.show');
 
     Route::get('/checkout', fn () => view('checkout'))->name('checkout');
-    Route::post('/orders', [StoreOrderController::class, 'store'])->name('orders.store');
+    Route::post('/orders', [StoreOrderController::class, 'store'])
+        ->middleware('throttle:store-orders')
+        ->name('orders.store');
     Route::redirect('/cart', '/checkout')->name('cart');
 
     Route::get('/about-us', fn () => view('pages.about'))->name('pages.about');
@@ -66,10 +82,16 @@ Route::name('store.')->group(function () {
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-        Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+        Route::post('/login', [AuthController::class, 'login'])
+            ->middleware('throttle:admin-login')
+            ->name('login.submit');
         Route::get('/login/verify', [AuthController::class, 'showVerifyOtp'])->name('login.verify');
-        Route::post('/login/verify', [AuthController::class, 'verifyOtp'])->name('login.verify.submit');
-        Route::post('/login/verify/resend', [AuthController::class, 'resendOtp'])->name('login.verify.resend');
+        Route::post('/login/verify', [AuthController::class, 'verifyOtp'])
+            ->middleware('throttle:admin-otp')
+            ->name('login.verify.submit');
+        Route::post('/login/verify/resend', [AuthController::class, 'resendOtp'])
+            ->middleware('throttle:admin-otp-resend')
+            ->name('login.verify.resend');
     });
 
     Route::middleware('admin')->group(function () {

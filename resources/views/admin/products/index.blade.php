@@ -47,6 +47,9 @@
     formDrawerOpen: {{ $shouldOpenForm ? 'true' : 'false' }},
     detailDrawerOpen: false,
     menuOpenId: null,
+    menuProduct: null,
+    menuTop: 0,
+    menuRight: 16,
     colorLabelCount: 0,
     newGalleryLabelCount: 0,
     hasVariants: {{ old('_form') === 'create' ? (old('has_variants', true) ? 'true' : 'false') : 'true' }},
@@ -113,8 +116,22 @@
         }
     },
 
-    toggleMenu(id) {
-        this.menuOpenId = this.menuOpenId === id ? null : id;
+    toggleMenu(id, product, event) {
+        if (this.menuOpenId === id) {
+            this.menuOpenId = null;
+            this.menuProduct = null;
+            return;
+        }
+        const rect = event.currentTarget.getBoundingClientRect();
+        this.menuTop = rect.bottom + 4;
+        this.menuRight = Math.max(16, window.innerWidth - rect.right);
+        this.menuOpenId = id;
+        this.menuProduct = product;
+    },
+
+    closeMenu() {
+        this.menuOpenId = null;
+        this.menuProduct = null;
     },
 
     openCreate() {
@@ -127,7 +144,7 @@
         this.newGalleryLabelCount = 0;
         this.hasVariants = true;
         this.detailDrawerOpen = false;
-        this.menuOpenId = null;
+        this.closeMenu();
         this.openDrawer('formDrawerOpen');
     },
 
@@ -138,14 +155,14 @@
         this.newGalleryLabelCount = 0;
         this.resetEditForm(product);
         this.detailDrawerOpen = false;
-        this.menuOpenId = null;
+        this.closeMenu();
         this.openDrawer('formDrawerOpen');
     },
 
     openDetail(product) {
         this.selectedProduct = product;
         this.formDrawerOpen = false;
-        this.menuOpenId = null;
+        this.closeMenu();
         this.openDrawer('detailDrawerOpen');
     },
 
@@ -154,7 +171,7 @@
         return 'AED ' + amount.toLocaleString('en-AE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     }
 }" x-init="@if($isEditing) resetEditForm(selectedProduct) @endif"
-   @click.outside="menuOpenId = null"
+   @click.outside="closeMenu()"
    @open-product-drawer.window="openCreate()">
 
     <form method="GET" action="{{ route('admin.products') }}" class="bg-white rounded-2xl border border-stone-200 p-4 mb-6 flex flex-col lg:flex-row gap-3">
@@ -283,59 +300,10 @@
                             </span>
                             @endif
                         </td>
-                        <td class="px-5 py-3 text-right relative">
-                            <button type="button" @click.stop="toggleMenu({{ $product->id }})" class="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition">
+                        <td class="px-5 py-3 text-right">
+                            <button type="button" @click.stop="toggleMenu({{ $product->id }}, @js($productData), $event)" class="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/></svg>
                             </button>
-                            <div x-show="menuOpenId === {{ $product->id }}" x-cloak @click.stop
-                                 class="absolute right-5 top-full mt-1 w-44 bg-white border border-stone-200 rounded-xl shadow-lg py-1 z-20 text-left">
-                                <button type="button" @click="openDetail(@js($productData))" class="w-full px-4 py-2.5 text-sm text-stone-700 hover:bg-stone-50 text-left">View Detail</button>
-                                @if ($showingTrashed)
-                                <form method="POST" action="{{ route('admin.products.restore', $product->id) }}{{ $filterQuery }}">
-                                    @csrf
-                                    @foreach ($filterParams as $key => $value)
-                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                                    @endforeach
-                                    <button type="submit" class="w-full px-4 py-2.5 text-sm text-emerald-700 hover:bg-emerald-50 text-left">Restore</button>
-                                </form>
-                                <form method="POST" action="{{ route('admin.products.force-destroy', $product->id) }}{{ $filterQuery }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    @foreach ($filterParams as $key => $value)
-                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                                    @endforeach
-                                    <button type="button"
-                                            @click="$store.adminConfirm.ask({
-                                                title: 'Delete permanently?',
-                                                message: 'This will permanently remove {{ addslashes($product->name) }} and all of its images. This cannot be undone.',
-                                                confirmLabel: 'Delete Permanently',
-                                                cancelLabel: 'Cancel',
-                                                tone: 'danger',
-                                                form: $el.closest('form')
-                                            })"
-                                            class="w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 text-left">Delete Permanently</button>
-                                </form>
-                                @else
-                                <button type="button" @click="openEdit(@js($productData))" class="w-full px-4 py-2.5 text-sm text-stone-700 hover:bg-stone-50 text-left">Edit Product</button>
-                                <form method="POST" action="{{ route('admin.products.destroy', $product) }}{{ $filterQuery }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    @foreach ($filterParams as $key => $value)
-                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                                    @endforeach
-                                    <button type="button"
-                                            @click="$store.adminConfirm.ask({
-                                                title: 'Move product to trash?',
-                                                message: '{{ addslashes($product->name) }} will be hidden from the store. You can restore it later from the Trash filter.',
-                                                confirmLabel: 'Move to Trash',
-                                                cancelLabel: 'Cancel',
-                                                tone: 'danger',
-                                                form: $el.closest('form')
-                                            })"
-                                            class="w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 text-left">Move to Trash</button>
-                                </form>
-                                @endif
-                            </div>
                         </td>
                     </tr>
                     @endforeach
@@ -345,6 +313,57 @@
         <div class="px-5 py-3 border-t border-stone-100 text-xs text-stone-500">
             Showing {{ $products->count() }} {{ $products->count() === 1 ? 'product' : 'products' }}
         </div>
+    </div>
+
+    <div x-show="menuOpenId && menuProduct" x-cloak @click.stop
+         class="fixed w-44 bg-white border border-stone-200 rounded-xl shadow-lg py-1 z-[100] text-left"
+         :style="`top: ${menuTop}px; right: ${menuRight}px`">
+        <button type="button" @click="openDetail(menuProduct)" class="w-full px-4 py-2.5 text-sm text-stone-700 hover:bg-stone-50 text-left">View Detail</button>
+        @if ($showingTrashed)
+        <form method="POST" x-bind:action="`{{ url('/admin/products') }}/${menuProduct?.id}/restore{{ $filterQuery }}`">
+            @csrf
+            @foreach ($filterParams as $key => $value)
+            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+            @endforeach
+            <button type="submit" class="w-full px-4 py-2.5 text-sm text-emerald-700 hover:bg-emerald-50 text-left">Restore</button>
+        </form>
+        <form method="POST" x-bind:action="`{{ url('/admin/products') }}/${menuProduct?.id}/force{{ $filterQuery }}`">
+            @csrf
+            @method('DELETE')
+            @foreach ($filterParams as $key => $value)
+            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+            @endforeach
+            <button type="button"
+                    @click="$store.adminConfirm.ask({
+                        title: 'Delete permanently?',
+                        message: (menuProduct?.name ?? 'This product') + ' and all of its images will be permanently removed. This cannot be undone.',
+                        confirmLabel: 'Delete Permanently',
+                        cancelLabel: 'Cancel',
+                        tone: 'danger',
+                        form: $el.closest('form')
+                    })"
+                    class="w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 text-left">Delete Permanently</button>
+        </form>
+        @else
+        <button type="button" @click="openEdit(menuProduct)" class="w-full px-4 py-2.5 text-sm text-stone-700 hover:bg-stone-50 text-left">Edit Product</button>
+        <form method="POST" x-bind:action="`{{ url('/admin/products') }}/${menuProduct?.id}{{ $filterQuery }}`">
+            @csrf
+            @method('DELETE')
+            @foreach ($filterParams as $key => $value)
+            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+            @endforeach
+            <button type="button"
+                    @click="$store.adminConfirm.ask({
+                        title: 'Move product to trash?',
+                        message: (menuProduct?.name ?? 'This product') + ' will be hidden from the store. You can restore it later from the Trash filter.',
+                        confirmLabel: 'Move to Trash',
+                        cancelLabel: 'Cancel',
+                        tone: 'danger',
+                        form: $el.closest('form')
+                    })"
+                    class="w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 text-left">Move to Trash</button>
+        </form>
+        @endif
     </div>
     @endif
 

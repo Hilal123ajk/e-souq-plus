@@ -1,17 +1,6 @@
 window.ESOUQ_ADMIN = {
-    stats: {
-        totalOrders: 0,
-        pendingOrders: 0,
-        deliveredOrders: 0,
-        totalCustomers: 0,
-        completedRevenue: 0,
-        completedOrderCount: 0,
-    },
-
     orders: [],
     customers: [],
-    bestsellers: [],
-    activity: [],
 
     statusColors: {
         pending: 'bg-amber-100 text-amber-800',

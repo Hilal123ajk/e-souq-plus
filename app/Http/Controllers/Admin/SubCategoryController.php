@@ -8,17 +8,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreSubCategoryRequest;
 use App\Http\Requests\Admin\UpdateSubCategoryRequest;
 use App\Models\Category;
-use App\Services\ActivityLogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class SubCategoryController extends Controller
 {
-    public function __construct(
-        private readonly ActivityLogService $activityLog,
-    ) {}
-
     public function index(): View
     {
         $search = request()->string('search')->trim()->toString();
@@ -83,8 +78,6 @@ class SubCategoryController extends Controller
 
         $category = Category::query()->create($data);
 
-        $this->activityLog->log('created', 'subcategory', $category->id, $category->title);
-
         return redirect()
             ->route('admin.subcategories')
             ->with('success', 'Sub-category created successfully.');
@@ -126,8 +119,6 @@ class SubCategoryController extends Controller
 
         $category->update($data);
 
-        $this->activityLog->log('updated', 'subcategory', $category->id, $category->title);
-
         return redirect()
             ->route('admin.subcategories', request()->only(['search', 'status', 'parent_id']))
             ->with('success', 'Sub-category updated successfully.');
@@ -145,12 +136,7 @@ class SubCategoryController extends Controller
                 ->withErrors(['category' => 'Cannot delete a sub-category that has products assigned.']);
         }
 
-        $name = $category->title;
-        $id = $category->id;
-
         $category->delete();
-
-        $this->activityLog->log('deleted', 'subcategory', $id, $name);
 
         return redirect()
             ->route('admin.subcategories', request()->only(['search', 'status', 'parent_id']))
@@ -164,8 +150,6 @@ class SubCategoryController extends Controller
             ->findOrFail($categoryId);
 
         $category->restore();
-
-        $this->activityLog->log('restored', 'subcategory', $category->id, $category->title);
 
         return redirect()
             ->route('admin.subcategories', request()->only(['search', 'status', 'parent_id']))
@@ -184,12 +168,7 @@ class SubCategoryController extends Controller
                 ->withErrors(['category' => 'Cannot permanently delete a sub-category that still has products assigned.']);
         }
 
-        $name = $category->title;
-        $id = $category->id;
-
         $category->forceDelete();
-
-        $this->activityLog->log('force_deleted', 'subcategory', $id, $name);
 
         return redirect()
             ->route('admin.subcategories', request()->only(['search', 'status', 'parent_id']))

@@ -58,18 +58,20 @@
                     </ul>
                 </div>
 
-                <div>
+                <div class="col-span-2 md:col-span-1">
                     <h4 class="text-white font-semibold mb-4">Contact</h4>
                     <ul class="space-y-3 text-sm">
-                        <li>
-                            <a href="tel:+923001234567" class="text-white font-medium hover:text-accent-400 transition">+92 300 1234567</a>
-                            <p class="text-stone-500 text-xs">Phone / SMS</p>
+                        <li class="flex items-start justify-between gap-4">
+                            <a href="tel:+923001234567" class="text-white font-medium hover:text-accent-400 transition shrink-0">+92 300 1234567</a>
+                            <span class="text-stone-500 text-xs text-right">Phone / SMS</span>
                         </li>
-                        <li>
+                        <li class="flex items-center justify-between gap-4">
                             <a href="https://wa.me/923001234567" target="_blank" rel="noopener" class="text-white font-medium hover:text-accent-400 transition">WhatsApp</a>
+                            <span class="text-stone-500 text-xs text-right">Chat with us</span>
                         </li>
-                        <li>
-                            <a href="mailto:hello@e-souq-plus.com" class="hover:text-accent-400 transition break-all">hello@e-souq-plus.com</a>
+                        <li class="flex items-start justify-between gap-4">
+                            <span class="text-stone-500 text-xs shrink-0 pt-0.5">Email</span>
+                            <a href="mailto:hello@e-souq-plus.com" class="text-white font-medium hover:text-accent-400 transition text-right break-all">hello@e-souq-plus.com</a>
                         </li>
                     </ul>
                 </div>

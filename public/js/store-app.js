@@ -68,7 +68,7 @@ document.addEventListener('alpine:init', () => {
 
         get deliveryFee() {
             if (this.total === 0) return 0;
-            return Number(window.ESOUQ_STORE.delivery?.fee ?? 249);
+            return Number(window.ESOUQ_STORE.delivery?.fee ?? 25);
         },
 
         get grandTotal() {
@@ -399,6 +399,8 @@ document.addEventListener('alpine:init', () => {
                     if (response.status === 422 && data.errors) {
                         const messages = Object.values(data.errors).flat();
                         this.error = messages[0] || 'Please check your order details and try again.';
+                    } else if (response.status === 429) {
+                        this.error = 'Too many order attempts. Please wait a minute and try again.';
                     } else {
                         this.error = data.message || 'Unable to place your order. Please try again.';
                     }

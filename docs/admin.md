@@ -180,12 +180,10 @@ No backend models, migrations, or controllers exist for orders or customers yet.
 | Seeder | Purpose |
 |--------|---------|
 | `UserSeeder` | Creates admin and manager accounts |
-| `StoreCategorySeeder` | Optional: seeds sample root categories with images (Carpets, Artificial Jewelry, Perfumes, Traditional Things, Stones and Rings, Mobile Accessories) |
 
 Run individually:
 ```bash
 php artisan db:seed --class=UserSeeder
-php artisan db:seed --class=StoreCategorySeeder
 ```
 
 ---
@@ -197,9 +195,3 @@ php artisan db:seed --class=StoreCategorySeeder
 - Models use `HasPublicStorageImage` trait for public URL resolution
 
 **If images do not load:** run `php artisan storage:link` on every new machine/deploy. Uploaded files are not in git — only paths in the database. On WAMP, set `APP_URL` to your full site URL (e.g. `http://localhost/e-souq-plus/public`).
-
----
-
-## Activity Logging
-
-`App\Services\ActivityLogService` exists as a stub (no-op). No `activity_logs` table yet. Admin controllers call it but nothing is persisted.

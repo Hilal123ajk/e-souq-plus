@@ -11,7 +11,6 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
-use App\Services\ActivityLogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -20,10 +19,6 @@ use Illuminate\View\View;
 
 class ProductController extends Controller
 {
-    public function __construct(
-        private readonly ActivityLogService $activityLog,
-    ) {}
-
     public function index(): View
     {
         $search = request()->string('search')->trim()->toString();
@@ -122,8 +117,6 @@ class ProductController extends Controller
         $product = Product::query()->create($data);
         $this->storeGalleryImages($product, $request);
 
-        $this->activityLog->log('created', 'product', $product->id, $product->name);
-
         return redirect()
             ->route('admin.products', $request->only(['search', 'category_id', 'brand_id', 'status']))
             ->with('success', 'Product created successfully.');
@@ -158,8 +151,6 @@ class ProductController extends Controller
         $this->removeGalleryImages($product, $request);
         $this->storeGalleryImages($product, $request);
 
-        $this->activityLog->log('updated', 'product', $product->id, $product->name);
-
         return redirect()
             ->route('admin.products', $request->only(['search', 'category_id', 'brand_id', 'status']))
             ->with('success', 'Product updated successfully.');
@@ -167,12 +158,7 @@ class ProductController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
-        $name = $product->name;
-        $id = $product->id;
-
         $product->delete();
-
-        $this->activityLog->log('deleted', 'product', $id, $name);
 
         return redirect()
             ->route('admin.products', request()->only(['search', 'category_id', 'brand_id', 'status']))
@@ -184,8 +170,6 @@ class ProductController extends Controller
         $product = Product::onlyTrashed()->findOrFail($productId);
         $product->restore();
 
-        $this->activityLog->log('restored', 'product', $product->id, $product->name);
-
         return redirect()
             ->route('admin.products', request()->only(['search', 'category_id', 'brand_id', 'status']))
             ->with('success', 'Product restored successfully.');
@@ -194,12 +178,7 @@ class ProductController extends Controller
     public function forceDestroy(int $productId): RedirectResponse
     {
         $product = Product::onlyTrashed()->findOrFail($productId);
-        $name = $product->name;
-        $id = $product->id;
-
         $product->forceDelete();
-
-        $this->activityLog->log('force_deleted', 'product', $id, $name);
 
         return redirect()
             ->route('admin.products', request()->only(['search', 'category_id', 'brand_id', 'status']))

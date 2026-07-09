@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('meta_title', 'FAQs')
+@section('meta_description', 'Frequently asked questions about shopping at E-Souq Plus — delivery, cash on delivery, returns, and product authenticity.')
+
 @section('content')
 <x-page-hero title="Frequently Asked Questions" subtitle="Answers to common questions about shopping at E-Souq Plus." />
 

@@ -23,11 +23,25 @@ class HomeController extends Controller
             'heroBanners' => StaticHomeBanners::slides(),
             'sidePromoCategories' => StaticHomeBanners::sidePromos(),
             'staticCategoryTiles' => StaticHomeBanners::categoryTiles(),
+            'seo' => [
+                'title' => 'Online Marketplace in UAE',
+                'description' => config('esouq.seo.default_description'),
+                'url' => route('store.home'),
+                'image' => \App\Support\Seo::defaultImage(),
+                'type' => 'website',
+            ],
         ]);
     }
 
     public function categories(): View
     {
-        return view('categories.index');
+        return view('categories.index', [
+            'seo' => [
+                'title' => 'Shop by Category',
+                'description' => 'Browse carpets, artificial jewelry, perfumes, stones & beads and more at E-Souq Plus.',
+                'url' => route('store.categories.index'),
+                'type' => 'website',
+            ],
+        ]);
     }
 }

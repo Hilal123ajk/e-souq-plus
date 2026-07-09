@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin') — E-Souq Plus</title>
 
+    <x-favicon />
+
     @vite(['resources/css/app.css'])
     @stack('head')
 </head>

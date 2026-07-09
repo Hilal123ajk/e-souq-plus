@@ -4,8 +4,34 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'E-Souq Plus — Online Marketplace in Pakistan')</title>
-    <meta name="description" content="@yield('meta_description', 'E-Souq Plus — Shop mobile accessories, furniture, home décor, electronics & more. Cash on delivery across Pakistan.')">
+    @php
+        use App\Support\Seo;
+
+        $pageSeo = $seo ?? [];
+        $metaTitle = $pageSeo['title'] ?? (trim($__env->yieldContent('meta_title')) ?: trim($__env->yieldContent('title')) ?: null);
+        $metaDescription = $pageSeo['description'] ?? (trim($__env->yieldContent('meta_description')) ?: null);
+        $metaUrl = $pageSeo['url'] ?? null;
+        $metaImage = $pageSeo['image'] ?? null;
+        $metaImageAlt = $pageSeo['image_alt'] ?? null;
+        $metaType = $pageSeo['type'] ?? 'website';
+        $pageStructuredData = $structuredData ?? ($pageSeo['structured_data'] ?? null);
+        $productPrice = $pageSeo['price'] ?? null;
+        $productCurrency = $pageSeo['currency'] ?? 'AED';
+    @endphp
+    <title>{{ Seo::title($metaTitle) }}</title>
+    <x-seo-meta
+        :meta-title="$metaTitle"
+        :meta-description="$metaDescription"
+        :meta-url="$metaUrl"
+        :meta-image="$metaImage"
+        :meta-image-alt="$metaImageAlt"
+        :meta-type="$metaType"
+        :product-price="$productPrice"
+        :product-currency="$productCurrency"
+        :structured-data="$pageStructuredData"
+    />
+
+    <x-favicon />
 
     @vite(['resources/css/app.css'])
     @stack('head')

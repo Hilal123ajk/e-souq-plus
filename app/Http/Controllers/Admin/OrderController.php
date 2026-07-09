@@ -7,16 +7,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateOrderStatusRequest;
 use App\Models\Order;
-use App\Services\ActivityLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
 class OrderController extends Controller
 {
-    public function __construct(
-        private readonly ActivityLogService $activityLog,
-    ) {}
-
     public function index(): View
     {
         $orders = Order::query()
@@ -35,8 +30,6 @@ class OrderController extends Controller
         $status = $request->validated('status');
 
         $order->update(['status' => $status]);
-
-        $this->activityLog->log('updated', 'order', $order->id, $order->order_number, "Status changed to {$status}");
 
         return response()->json([
             'message' => 'Order status updated.',

@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('meta_title', 'Delivery Process')
+@section('meta_description', 'How E-Souq Plus delivers your order across Pakistan. Processing times, shipping, and cash on delivery details.')
+
 @section('content')
 <x-page-hero title="Delivery Process" subtitle="How we ship your order across Pakistan — step by step." breadcrumb="Delivery" />
 
@@ -35,7 +38,7 @@
 
     <h2 class="text-lg font-bold text-stone-900 mb-4">Delivery Fee</h2>
     <p class="text-stone-600 leading-relaxed mb-8">
-        A flat delivery fee of <strong class="text-souq-800">AED 25</strong> applies to all orders. Free delivery on orders above AED 500. The fee is shown at checkout before you confirm.
+        A flat delivery fee of <strong class="text-souq-800">AED 25</strong> applies to all orders. The fee is shown at checkout before you confirm.
     </p>
 
     <h2 class="text-lg font-bold text-stone-900 mb-4">Processing & Delivery Time</h2>

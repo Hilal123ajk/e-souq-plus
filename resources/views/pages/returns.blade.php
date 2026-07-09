@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('meta_title', 'Returns & Exchange')
+@section('meta_description', 'E-Souq Plus returns and exchange policy. Simple, customer-friendly returns for damaged or wrong items.')
+
 @section('content')
 <x-page-hero title="Returns & Exchange" subtitle="A simple, customer-friendly return policy." />
 

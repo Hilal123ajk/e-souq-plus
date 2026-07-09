@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-@section('title', 'Product — E-Souq Plus')
-
 @section('content')
 <section x-data="{
     slug: @js($slug),
@@ -32,7 +30,7 @@
     },
     selectThumbnail(key) { this.selectedImageKey = key; },
     addToCart(openDrawer = true) { this.$store.cart.add(this.product, this.quantity, openDrawer, this.selectedVariant); }
-}" x-init="if (product) document.title = product.name + ' — E-Souq Plus'">
+}">
 
     <template x-if="!product">
         <div class="max-w-7xl mx-auto px-4 py-20 text-center">
@@ -71,17 +69,19 @@
                 <div class="grid lg:grid-cols-12 gap-8 lg:gap-10">
                     {{-- Gallery --}}
                     <div class="lg:col-span-7">
-                        <div class="bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden">
-                            <div class="aspect-square md:aspect-[4/3] lg:aspect-square bg-gradient-to-br from-stone-50 to-stone-100 p-4 md:p-8">
-                                <img :src="displayImage" :alt="product.name" class="w-full h-full object-contain drop-shadow-sm">
+                        <div class="flex flex-col lg:flex-row lg:items-start gap-5 lg:gap-6">
+                            <div class="flex-1 min-w-0 order-1">
+                                <div class="aspect-square md:aspect-[4/3] lg:aspect-square flex items-center justify-center">
+                                    <img :src="displayImage" :alt="product.name" class="w-full h-full object-contain">
+                                </div>
                             </div>
-                            <div class="px-4 pb-4 md:px-6 md:pb-6" x-show="thumbnails.length > 1">
-                                <div class="flex gap-2.5 overflow-x-auto scrollbar-hide pt-1">
+                            <div class="order-2 shrink-0" x-show="thumbnails.length > 1">
+                                <div class="flex gap-3 overflow-x-auto scrollbar-hide lg:flex-col lg:overflow-visible lg:w-20">
                                     <template x-for="thumb in thumbnails" :key="thumb.key">
                                         <button type="button" @click="selectThumbnail(thumb.key)"
-                                                :class="selectedImageKey === thumb.key ? 'ring-2 ring-souq-500 border-souq-200' : 'ring-1 ring-stone-200 border-transparent'"
-                                                class="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden shrink-0 bg-white border transition">
-                                            <img :src="thumb.url" :alt="thumb.label" class="w-full h-full object-contain p-1">
+                                                :class="selectedImageKey === thumb.key ? 'opacity-100' : 'opacity-45 hover:opacity-75'"
+                                                class="w-[4.5rem] h-[4.5rem] lg:w-20 lg:h-20 shrink-0 transition-opacity">
+                                            <img :src="thumb.url" :alt="thumb.label" class="w-full h-full object-contain">
                                         </button>
                                     </template>
                                 </div>

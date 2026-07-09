@@ -27,12 +27,12 @@ e-souq-plus/
 │   │   ├── Admin/          # Admin CRUD + auth
 │   │   └── Store/          # Storefront page controllers
 │   ├── Models/             # Brand, Category, Product, ProductImage, User
-│   ├── Services/           # StoreCatalogService, AdminOtpService, ActivityLogService
+│   ├── Services/           # StoreCatalogService, AdminOtpService, OrderService
 │   ├── Support/            # DeliveryPolicy
 │   └── Jobs/               # SendAdminLoginOtp
 ├── config/esouq.php        # Delivery fee, OTP settings
 ├── database/migrations/    # Catalog + admin auth tables
-├── database/seeders/       # UserSeeder, StoreCategorySeeder
+├── database/seeders/       # UserSeeder
 ├── public/
 │   ├── js/store-data.js    # Client helpers (formatPrice, getProduct, etc.)
 │   ├── js/store-app.js     # Cart, filters, checkout, hero slider
@@ -55,7 +55,6 @@ php artisan key:generate
 php artisan migrate
 php artisan storage:link
 php artisan db:seed --class=UserSeeder
-php artisan db:seed --class=StoreCategorySeeder   # optional sample categories
 php artisan queue:work database                   # required for OTP emails
 php artisan serve
 ```
@@ -98,12 +97,10 @@ Admin login: `/admin/login`
 
 ### Not Yet Implemented
 
-- **Orders:** Admin orders page is UI-only; checkout does not persist orders to the database
 - **Customers:** Admin customers page is UI-only
-- **Order API:** Checkout submits client-side only (mock order number)
-- **Activity logs:** `ActivityLogService` is a no-op stub
+- **Dashboard analytics:** Stats/recent orders not wired to the database
 - **Customer accounts:** No user registration/login on the storefront
-- **Payment gateways:** Cash on Delivery UI only
+- **Payment gateways:** Cash on Delivery only
 
 ## Related Docs
 

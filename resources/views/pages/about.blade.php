@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('meta_title', 'About Us')
+@section('meta_description', 'Learn about E-Souq Plus — Pakistan\'s growing online marketplace for mobile accessories, furniture, home décor, electronics and more.')
+
 @section('content')
 <x-page-hero title="About Us" subtitle="Pakistan's growing online marketplace for accessories, furniture & more." />
 

@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Store;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Services\StoreCatalogService;
+use App\Support\Seo;
 use Illuminate\View\View;
 
 class CategoryController extends Controller
@@ -31,6 +32,7 @@ class CategoryController extends Controller
             'filterSlug' => $category->slug,
             'rootCategorySlug' => $category->slug,
             'includeChildProducts' => true,
+            'seo' => Seo::forCategory($category),
         ]);
     }
 
@@ -56,6 +58,7 @@ class CategoryController extends Controller
             'filterSlug' => $category->slug,
             'rootCategorySlug' => $parent->slug,
             'includeChildProducts' => false,
+            'seo' => Seo::forCategory($category),
         ]);
     }
 }

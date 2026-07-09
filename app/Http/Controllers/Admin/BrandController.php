@@ -8,17 +8,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreBrandRequest;
 use App\Http\Requests\Admin\UpdateBrandRequest;
 use App\Models\Brand;
-use App\Services\ActivityLogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class BrandController extends Controller
 {
-    public function __construct(
-        private readonly ActivityLogService $activityLog,
-    ) {}
-
     public function index(): View
     {
         $search = request()->string('search')->trim()->toString();
@@ -54,8 +49,6 @@ class BrandController extends Controller
 
         $brand = Brand::query()->create($data);
 
-        $this->activityLog->log('created', 'brand', $brand->id, $brand->title);
-
         return redirect()
             ->route('admin.brands')
             ->with('success', 'Brand created successfully.');
@@ -83,8 +76,6 @@ class BrandController extends Controller
 
         $brand->update($data);
 
-        $this->activityLog->log('updated', 'brand', $brand->id, $brand->title);
-
         return redirect()
             ->route('admin.brands')
             ->with('success', 'Brand updated successfully.');
@@ -92,12 +83,7 @@ class BrandController extends Controller
 
     public function destroy(Brand $brand): RedirectResponse
     {
-        $name = $brand->title;
-        $id = $brand->id;
-
         $brand->delete();
-
-        $this->activityLog->log('deleted', 'brand', $id, $name);
 
         return redirect()
             ->route('admin.brands')

@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('meta_title', 'Contact Us')
+@section('meta_description', 'Contact E-Souq Plus by phone, WhatsApp, or email. We help with orders, products, and delivery across Pakistan.')
+
 @section('content')
 <x-page-hero title="Contact Us" subtitle="We're here to help with orders, products, and delivery questions." />
 
