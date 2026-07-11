@@ -54,6 +54,8 @@ class Order extends Model
         'stripe_checkout_session_id',
         'stripe_payment_intent_id',
         'paid_at',
+        'customer_notified_at',
+        'admin_notified_user_ids',
         'subtotal',
         'delivery_fee',
         'total',
@@ -66,6 +68,8 @@ class Order extends Model
             'delivery_fee' => 'decimal:2',
             'total' => 'decimal:2',
             'paid_at' => 'datetime',
+            'customer_notified_at' => 'datetime',
+            'admin_notified_user_ids' => 'array',
         ];
     }
 

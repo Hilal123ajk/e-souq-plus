@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Jobs\SendOrderPlacedNotifications;
 use App\Models\Order;
 use App\Models\Product;
 use App\Support\DeliveryPolicy;
@@ -55,6 +56,8 @@ class OrderService
 
             $this->createOrderItemsAndDecrementStock($order, $lineItems);
             $order->load('items');
+
+            DB::afterCommit(fn () => SendOrderPlacedNotifications::dispatch($order->id));
 
             return [
                 'order' => $order,
@@ -171,6 +174,8 @@ class OrderService
             $this->paymentEventService->recordPaymentSucceeded($order, $session, [
                 'source' => 'fulfillment',
             ]);
+
+            DB::afterCommit(fn () => SendOrderPlacedNotifications::dispatch($order->id));
 
             return $order->fresh(['items', 'paymentEvents']);
         });
