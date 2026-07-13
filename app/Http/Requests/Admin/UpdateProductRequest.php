@@ -31,6 +31,12 @@ class UpdateProductRequest extends FormRequest
                 Rule::unique('products', 'slug')->ignore($productId),
             ],
             'description' => ['nullable', 'string'],
+            'material' => ['nullable', 'string', 'max:255'],
+            'finish' => ['nullable', 'string', 'max:255'],
+            'has_dimensions' => ['sometimes', 'boolean'],
+            'thickness' => ['nullable', 'numeric', 'min:0', Rule::requiredIf(fn () => $this->boolean('has_dimensions'))],
+            'height' => ['nullable', 'numeric', 'min:0', Rule::requiredIf(fn () => $this->boolean('has_dimensions'))],
+            'width' => ['nullable', 'numeric', 'min:0', Rule::requiredIf(fn () => $this->boolean('has_dimensions'))],
             'sku' => [
                 'required',
                 'string',
@@ -54,10 +60,18 @@ class UpdateProductRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $hasDimensions = $this->boolean('has_dimensions');
+
         $this->merge([
             'is_active' => $this->boolean('is_active'),
             'is_featured' => $this->boolean('is_featured'),
             'has_variants' => $this->boolean('has_variants'),
+            'has_dimensions' => $hasDimensions,
+            'material' => $this->filled('material') ? $this->string('material')->trim()->toString() : null,
+            'finish' => $this->filled('finish') ? $this->string('finish')->trim()->toString() : null,
+            'thickness' => $hasDimensions && $this->filled('thickness') ? $this->input('thickness') : null,
+            'height' => $hasDimensions && $this->filled('height') ? $this->input('height') : null,
+            'width' => $hasDimensions && $this->filled('width') ? $this->input('width') : null,
             'brand_id' => $this->input('brand_id') ?: null,
             'sub_category_id' => $this->input('sub_category_id') ?: null,
             'category_id' => $this->input('sub_category_id') ?: $this->input('main_category_id'),

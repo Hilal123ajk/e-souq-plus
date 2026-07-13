@@ -121,7 +121,19 @@
                                     <p class="text-sm text-stone-500" x-text="selectedVariant.label"></p>
                                 </div>
 
-                                <p class="mt-5 text-sm text-stone-600 leading-relaxed border-t border-stone-100 pt-5" x-text="product.description"></p>
+                                <p class="mt-5 text-sm text-stone-600 leading-relaxed border-t border-stone-100 pt-5" x-show="product.description" x-text="product.description"></p>
+
+                                <div class="mt-5 border-t border-stone-100 pt-5" x-show="product.specifications && product.specifications.length">
+                                    <p class="text-sm font-semibold text-stone-800 mb-3">Specifications</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <template x-for="spec in product.specifications" :key="spec.label">
+                                            <span class="inline-flex items-center gap-1.5 max-w-full px-3 py-1.5 rounded-full bg-stone-100 text-stone-700 text-xs font-medium">
+                                                <span class="text-stone-500 font-semibold" x-text="spec.label + ':'"></span>
+                                                <span class="text-stone-800 truncate" x-text="spec.value"></span>
+                                            </span>
+                                        </template>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="bg-white rounded-3xl border border-stone-200 shadow-sm p-5 md:p-6">

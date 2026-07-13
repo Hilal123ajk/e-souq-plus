@@ -28,6 +28,12 @@
         'name' => old('name'),
         'slug' => old('slug'),
         'description' => old('description'),
+        'material' => old('material'),
+        'finish' => old('finish'),
+        'has_dimensions' => (bool) old('has_dimensions'),
+        'thickness' => old('thickness'),
+        'height' => old('height'),
+        'width' => old('width'),
         'sku' => old('sku'),
         'category_id' => old('sub_category_id') ?: old('main_category_id'),
         'category_parent_id' => old('sub_category_id') ? old('main_category_id') : null,
@@ -53,6 +59,7 @@
     colorLabelCount: 0,
     newGalleryLabelCount: 0,
     hasVariants: {{ old('_form') === 'create' ? (old('has_variants', true) ? 'true' : 'false') : 'true' }},
+    hasDimensions: {{ old('_form') === 'create' ? (old('has_dimensions') ? 'true' : 'false') : 'false' }},
     editing: {{ $isEditing ? 'true' : 'false' }},
     editingId: {{ $isEditing ? (int) old('_product_id') : 'null' }},
     selectedProduct: @js($editProductFromOld),
@@ -64,6 +71,12 @@
         name: '',
         slug: '',
         description: '',
+        material: '',
+        finish: '',
+        has_dimensions: false,
+        thickness: '',
+        height: '',
+        width: '',
         sku: '',
         sub_category_id: '',
         brand_id: '',
@@ -87,6 +100,12 @@
             name: product?.name ?? '',
             slug: product?.slug ?? '',
             description: product?.description ?? '',
+            material: product?.material ?? '',
+            finish: product?.finish ?? '',
+            has_dimensions: product?.has_dimensions ?? false,
+            thickness: product?.thickness ?? '',
+            height: product?.height ?? '',
+            width: product?.width ?? '',
             sku: product?.sku ?? '',
             sub_category_id: isSubCategory ? String(product.category_id) : '',
             brand_id: product?.brand_id ?? '',
@@ -102,6 +121,7 @@
             ? String(isSubCategory ? product.category_parent_id : product.category_id)
             : '';
         this.hasVariants = product?.has_variants ?? true;
+        this.hasDimensions = product?.has_dimensions ?? false;
     },
 
     openDrawer(flag) {
@@ -143,6 +163,7 @@
         this.colorLabelCount = 0;
         this.newGalleryLabelCount = 0;
         this.hasVariants = true;
+        this.hasDimensions = false;
         this.detailDrawerOpen = false;
         this.closeMenu();
         this.openDrawer('formDrawerOpen');
@@ -180,11 +201,10 @@
         <select name="category_id" class="px-4 py-2.5 border border-stone-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-souq-500">
             <option value="">All Categories</option>
             @foreach ($mainCategories as $main)
-            <optgroup label="{{ $main->title }}">
-                @foreach ($subcategories->where('parent_id', $main->id) as $sub)
-                <option value="{{ $sub->id }}" @selected($categoryId === $sub->id)>{{ $sub->title }}</option>
-                @endforeach
-            </optgroup>
+            <option value="{{ $main->id }}" @selected($categoryId === $main->id)>{{ $main->title }}</option>
+            @foreach ($subcategories->where('parent_id', $main->id) as $sub)
+            <option value="{{ $sub->id }}" @selected($categoryId === $sub->id)>&nbsp;&nbsp;{{ $sub->title }}</option>
+            @endforeach
             @endforeach
         </select>
         <select name="brand_id" class="px-4 py-2.5 border border-stone-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-souq-500">
@@ -239,6 +259,12 @@
                             'name' => $product->name,
                             'slug' => $product->slug,
                             'description' => $product->description,
+                            'material' => $product->material,
+                            'finish' => $product->finish,
+                            'has_dimensions' => $product->has_dimensions,
+                            'thickness' => $product->thickness,
+                            'height' => $product->height,
+                            'width' => $product->width,
                             'sku' => $product->sku,
                             'category_id' => $product->category_id,
                             'category_parent_id' => $product->category?->parent_id,
@@ -408,6 +434,56 @@
                     <textarea name="description" rows="3"
                               class="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-souq-500">{{ old('_form') === 'create' ? old('description') : '' }}</textarea>
                 </div>
+
+                <div class="pt-2 border-t border-stone-100">
+                    <p class="text-xs font-bold text-stone-900 uppercase tracking-wide mb-3">Specifications</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs font-semibold text-stone-600 block mb-1">Material</label>
+                            <input type="text" name="material" value="{{ old('_form') === 'create' ? old('material') : '' }}"
+                                   placeholder="e.g. Wood, Metal, Acrylic"
+                                   class="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-souq-500">
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-stone-600 block mb-1">Finish</label>
+                            <input type="text" name="finish" value="{{ old('_form') === 'create' ? old('finish') : '' }}"
+                                   placeholder="e.g. Smooth, Matte, Glossy"
+                                   class="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-souq-500">
+                        </div>
+                    </div>
+                    <div class="mt-3 p-4 rounded-xl border border-stone-200 bg-stone-50 space-y-3">
+                        <label class="flex items-start gap-3 text-sm cursor-pointer">
+                            <input type="hidden" name="has_dimensions" value="0">
+                            <input type="checkbox" name="has_dimensions" value="1" x-model="hasDimensions"
+                                   class="rounded accent-souq-600 mt-0.5" {{ old('_form') === 'create' && old('has_dimensions') ? 'checked' : '' }}>
+                            <span>
+                                <span class="font-semibold text-stone-900 block">This product has dimensions</span>
+                                <span class="text-xs text-stone-500">Enable when thickness, height, and width matter for this item.</span>
+                            </span>
+                        </label>
+                        <div class="grid grid-cols-3 gap-3" x-show="hasDimensions" x-cloak>
+                            <div>
+                                <label class="text-xs font-semibold text-stone-600 block mb-1">Thickness (cm) <span class="text-red-500">*</span></label>
+                                <input type="number" name="thickness" value="{{ old('_form') === 'create' ? old('thickness') : '' }}" min="0" step="0.01"
+                                       :required="hasDimensions"
+                                       class="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-souq-500">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-stone-600 block mb-1">Height (cm) <span class="text-red-500">*</span></label>
+                                <input type="number" name="height" value="{{ old('_form') === 'create' ? old('height') : '' }}" min="0" step="0.01"
+                                       :required="hasDimensions"
+                                       class="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-souq-500">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-stone-600 block mb-1">Width (cm) <span class="text-red-500">*</span></label>
+                                <input type="number" name="width" value="{{ old('_form') === 'create' ? old('width') : '' }}" min="0" step="0.01"
+                                       :required="hasDimensions"
+                                       class="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-souq-500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-xs font-semibold text-stone-600 block mb-1">SKU <span class="text-red-500">*</span></label>
@@ -568,6 +644,57 @@
                     <textarea name="description" rows="3" x-model="editForm.description"
                               class="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-souq-500"></textarea>
                 </div>
+
+                <div class="pt-2 border-t border-stone-100">
+                    <p class="text-xs font-bold text-stone-900 uppercase tracking-wide mb-3">Specifications</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs font-semibold text-stone-600 block mb-1">Material</label>
+                            <input type="text" name="material" x-model="editForm.material"
+                                   placeholder="e.g. Wood, Metal, Acrylic"
+                                   class="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-souq-500">
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-stone-600 block mb-1">Finish</label>
+                            <input type="text" name="finish" x-model="editForm.finish"
+                                   placeholder="e.g. Smooth, Matte, Glossy"
+                                   class="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-souq-500">
+                        </div>
+                    </div>
+                    <div class="mt-3 p-4 rounded-xl border border-stone-200 bg-stone-50 space-y-3">
+                        <label class="flex items-start gap-3 text-sm cursor-pointer">
+                            <input type="hidden" name="has_dimensions" value="0">
+                            <input type="checkbox" name="has_dimensions" value="1" x-model="editForm.has_dimensions"
+                                   @change="hasDimensions = editForm.has_dimensions"
+                                   class="rounded accent-souq-600 mt-0.5">
+                            <span>
+                                <span class="font-semibold text-stone-900 block">This product has dimensions</span>
+                                <span class="text-xs text-stone-500">Enable when thickness, height, and width matter for this item.</span>
+                            </span>
+                        </label>
+                        <div class="grid grid-cols-3 gap-3" x-show="editForm.has_dimensions" x-cloak>
+                            <div>
+                                <label class="text-xs font-semibold text-stone-600 block mb-1">Thickness (cm) <span class="text-red-500">*</span></label>
+                                <input type="number" name="thickness" min="0" step="0.01" x-model="editForm.thickness"
+                                       :required="editForm.has_dimensions"
+                                       class="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-souq-500">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-stone-600 block mb-1">Height (cm) <span class="text-red-500">*</span></label>
+                                <input type="number" name="height" min="0" step="0.01" x-model="editForm.height"
+                                       :required="editForm.has_dimensions"
+                                       class="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-souq-500">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-stone-600 block mb-1">Width (cm) <span class="text-red-500">*</span></label>
+                                <input type="number" name="width" min="0" step="0.01" x-model="editForm.width"
+                                       :required="editForm.has_dimensions"
+                                       class="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-souq-500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-xs font-semibold text-stone-600 block mb-1">SKU <span class="text-red-500">*</span></label>
@@ -765,6 +892,38 @@
                         <p class="text-2xl font-extrabold text-stone-900 mt-2" x-text="formatPrice(selectedProduct.price)"></p>
                     </div>
                     <p class="text-sm text-stone-600" x-show="selectedProduct.description" x-text="selectedProduct.description"></p>
+                    <dl class="grid grid-cols-2 gap-4 text-sm" x-show="selectedProduct.material || selectedProduct.finish || selectedProduct.has_dimensions">
+                        <template x-if="selectedProduct.material">
+                            <div>
+                                <dt class="text-xs text-stone-500">Material</dt>
+                                <dd class="font-medium" x-text="selectedProduct.material"></dd>
+                            </div>
+                        </template>
+                        <template x-if="selectedProduct.finish">
+                            <div>
+                                <dt class="text-xs text-stone-500">Finish</dt>
+                                <dd class="font-medium" x-text="selectedProduct.finish"></dd>
+                            </div>
+                        </template>
+                        <template x-if="selectedProduct.has_dimensions">
+                            <div>
+                                <dt class="text-xs text-stone-500">Thickness</dt>
+                                <dd class="font-medium" x-text="(selectedProduct.thickness ?? '—') + ' cm'"></dd>
+                            </div>
+                        </template>
+                        <template x-if="selectedProduct.has_dimensions">
+                            <div>
+                                <dt class="text-xs text-stone-500">Height</dt>
+                                <dd class="font-medium" x-text="(selectedProduct.height ?? '—') + ' cm'"></dd>
+                            </div>
+                        </template>
+                        <template x-if="selectedProduct.has_dimensions">
+                            <div>
+                                <dt class="text-xs text-stone-500">Width</dt>
+                                <dd class="font-medium" x-text="(selectedProduct.width ?? '—') + ' cm'"></dd>
+                            </div>
+                        </template>
+                    </dl>
                     <dl class="grid grid-cols-2 gap-4 text-sm">
                         <div>
                             <dt class="text-xs text-stone-500">SKU</dt>
